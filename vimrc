@@ -20,6 +20,9 @@ call plug#begin('~/.vim/plugged')
     " Nice color scheme
     Plug 'morhetz/gruvbox'
 
+    " NERDTree - a filesystem explorer
+    Plug 'preservim/nerdtree'
+
 call plug#end()
 
 " Run PlugInstall if there are missing plugins
@@ -72,6 +75,16 @@ autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 " instead of :q from opening command line history
 " (http://vim.wikia.com/wiki/Using_command-line_history)
 nnoremap q: <NOP>
+
+" \f will open/close NERDTree
+nnoremap <Leader>f :NERDTreeToggle<Enter>
+
+" Fix NerdTree ^G characters on MacOS
+let g:NERDTreeNodeDelimiter = "\u00a0"
+
+" Have vim close if nerdtree is open, but you close the last file you're editing
+" Without this, if you close the file, NerdTree will still be open on its own
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
 " Fix numpad keys over Putty
 inoremap <Esc>Oq 1
