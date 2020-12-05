@@ -26,6 +26,9 @@ call plug#begin('~/.vim/plugged')
     Plug 'preservim/nerdtree' |
         \ Plug 'Xuyuanp/nerdtree-git-plugin'
 
+    " Git integration
+    Plug 'airblade/vim-gitgutter'
+
 call plug#end()
 
 " Run PlugInstall if there are missing plugins
@@ -89,6 +92,10 @@ let g:NERDTreeNodeDelimiter = "\u00a0"
 " Without this, if you close the file, NerdTree will still be open on its own
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
+" Length of idle time before vim writes to the swapfile
+" Also controls how often vim updates git tags in gitgutter bar
+set updatetime=100
+
 " Fix numpad keys over Putty
 inoremap <Esc>Oq 1
 inoremap <Esc>Or 2
@@ -139,6 +146,7 @@ nnoremap OP <NOP>
 function ToggleLineNumbers()
     :set number!
     :set relativenumber!
+    :GitGutterToggle
 endfunction
 
 " Create a command that calls the function
