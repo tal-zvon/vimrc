@@ -1,0 +1,4 @@
+My .vimrc file
+
+Automatically installs Vim-Plug, and any plugins I need before configuring
+them
