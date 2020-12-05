@@ -21,7 +21,8 @@ call plug#begin('~/.vim/plugged')
     Plug 'morhetz/gruvbox'
 
     " NERDTree - a filesystem explorer
-    Plug 'preservim/nerdtree'
+    Plug 'preservim/nerdtree' |
+        \ Plug 'Xuyuanp/nerdtree-git-plugin'
 
 call plug#end()
 
