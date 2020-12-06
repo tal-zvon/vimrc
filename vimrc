@@ -32,6 +32,9 @@ call plug#begin('~/.vim/plugged')
     " Tagbar
     Plug 'majutsushi/tagbar'
 
+    " Powerline
+    Plug 'vim-airline/vim-airline'
+
 call plug#end()
 
 " Run PlugInstall if there are missing plugins
@@ -106,6 +109,9 @@ set foldlevel=99
 
 " Restore place in file from previous session
 autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+
+" Allow modified buffers to be in the background without warning
+set hidden
 
 " #################
 " # Mouse Support #
@@ -227,6 +233,13 @@ function! XTermPasteBegin()
 endfunction
 
 inoremap <special> <expr> <Esc>[200~ XTermPasteBegin()
+
+" #############
+" # Powerline #
+" #############
+
+" Show buffers at the top
+let g:airline#extensions#tabline#enabled = 1
 
 " #############
 " # Copy Mode #
