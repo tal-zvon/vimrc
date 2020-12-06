@@ -81,6 +81,13 @@ autocmd FileType javascript setlocal tabstop=2 shiftwidth=2 softtabstop=2
 " Always show the status bar
 set laststatus=2
 
+" Indent/Unindent with tab/shift-tab
+nmap <Tab> >>
+nmap <S-tab> <<
+imap <S-Tab> <Esc><<i
+vmap <Tab> >gv
+vmap <S-Tab> <gv
+
 " Disable auto-comment insertion on newline
 autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 
