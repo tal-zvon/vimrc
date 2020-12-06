@@ -4,7 +4,18 @@ Automatically installs Vim-Plug, and any plugins I need before configuring
 them.
 
 Install:
-    curl -sfLo ~/.vimrc https://github.com/terminator14/vimrc
+    Install ctags:
+        Debian:
+            $ sudo apt-get install ctags
+
+        CentOS:
+            $ sudo dnf install ctags
+
+        MacOS:
+            $ brew install ctags
+
+    Install my vimrc:
+        curl -sfLo ~/.vimrc https://github.com/terminator14/vimrc
 
 Shortcuts:
     \m - Enable/Disable mouse
