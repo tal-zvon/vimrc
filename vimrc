@@ -90,8 +90,8 @@ autocmd VimEnter * ToggleSpaceHi
 " # NERDTree #
 " ############
 
-" \f will open/close NERDTree
-nnoremap <Leader>f :NERDTreeToggle<Enter>
+" \n will open/close NERDTree
+nnoremap <Leader>n :NERDTreeToggle<Enter>
 
 " Fix NerdTree ^G characters on MacOS
 let g:NERDTreeNodeDelimiter = "\u00a0"
