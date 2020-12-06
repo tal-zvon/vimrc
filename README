@@ -15,7 +15,7 @@ Shortcuts:
 
         Hides line numbers, NERDTree, Tagbar, Git Gutter, and disables
         Mouse
-    Ctrl+a - Make vimdiff ignore CachedBmp files (for Adobe Animate)
+    \a - Make vimdiff ignore CachedBmp files (for Adobe Animate)
     Ctrl+n - Next buffer
     Ctrl+p - Previous buffer
     \w - Enable-disable whitespace highlighting

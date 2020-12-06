@@ -369,5 +369,5 @@ endfunction
 " Without this, you'd need to run ":call AA()" in vim
 command! AA call AA()
 
-" If you click Ctrl+A, run :AA
-nnoremap <C-A> :AA<CR>
+" If you hit \a, run :AA
+map <leader>a :AA<CR>
