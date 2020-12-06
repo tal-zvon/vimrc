@@ -58,13 +58,6 @@ set number
 " Enable relative line numbers
 set relativenumber
 
-" Set color scheme
-colorscheme gruvbox
-set bg=dark
-
-" Enable whitespace highlighting plugin
-autocmd VimEnter * ToggleSpaceHi
-
 " show existing tab with 4 spaces width
 set tabstop=4
 
@@ -82,6 +75,21 @@ autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 " (http://vim.wikia.com/wiki/Using_command-line_history)
 nnoremap q: <NOP>
 
+" Length of idle time before vim writes to the swapfile
+" Also controls how often vim updates git tags in gitgutter bar
+set updatetime=100
+
+" #################################
+" # Whitespace Highlighter Plugin #
+" #################################
+
+" Enable whitespace highlighting plugin
+autocmd VimEnter * ToggleSpaceHi
+
+" ############
+" # NERDTree #
+" ############
+
 " \f will open/close NERDTree
 nnoremap <Leader>f :NERDTreeToggle<Enter>
 
@@ -92,9 +100,9 @@ let g:NERDTreeNodeDelimiter = "\u00a0"
 " Without this, if you close the file, NerdTree will still be open on its own
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
-" Length of idle time before vim writes to the swapfile
-" Also controls how often vim updates git tags in gitgutter bar
-set updatetime=100
+" ###########
+" # NumLock #
+" ###########
 
 " Fix numpad keys over Putty
 inoremap <Esc>Oq 1
@@ -136,6 +144,14 @@ nnoremap OP <NOP>
 "inoremap Ok +
 "inoremap Om -
 "inoremap OM <Enter>
+
+" ###########
+" # Gruvbox #
+" ###########
+
+" Set color scheme
+colorscheme gruvbox
+set bg=dark
 
 " ###################################
 " # Easy Line Number Disable/Enable #
