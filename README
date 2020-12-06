@@ -1,4 +1,20 @@
 My .vimrc file
 
 Automatically installs Vim-Plug, and any plugins I need before configuring
-them
+them.
+
+Install:
+    curl -sfLo ~/.vimrc https://github.com/terminator14/vimrc
+
+Shortcuts:
+    \m - Enable/Disable mouse
+    \n - Enable/Disable NERDTree
+    \t - Enable/Disable Tagbar
+    \c - Enable/Disable Copy Mode
+        Makes it easy to copy lines
+
+        Hides line numbers, NERDTree, Tagbar, Git Gutter, and disables
+        Mouse
+    Ctrl+A - Make vimdiff ignore CachedBmp files (for Adobe Animate)
+    F3 - Enable-disable whitespace highlighting
+        Tabs, and trailing spaces
