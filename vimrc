@@ -162,24 +162,29 @@ set bg=dark
 
 map <leader>t :TagbarToggle<CR>
 
-" ###################################
-" # Easy Line Number Disable/Enable #
-" ###################################
+" #############
+" # Copy Mode #
+" #############
 
-" Ctrl-L to enable/disable line numbers
+" Ctrl-C to enter/exit copy mode
+" Useful if you want to copy something to clipboard
+" This closes everything that might get in your way
+" Note: Copy mode is just something I came up with - not a real thing
 
-function ToggleLineNumbers()
+function ToggleCopyMode()
     :set number!
     :set relativenumber!
     :GitGutterToggle
+    :NERDTreeClose
+    :TagbarClose
 endfunction
 
 " Create a command that calls the function
-" Without this, you'd need to run ":call ToggleLineNumbers" in vim
-command! ToggleLineNumbers call ToggleLineNumbers()
+" Without this, you'd need to run ":call ToggleCopyMode" in vim
+command! ToggleCopyMode call ToggleCopyMode()
 
 " If you click Ctrl+L, run :ToggleLineNumbers
-nnoremap <C-L> :ToggleLineNumbers<CR>
+nnoremap <C-C> :ToggleCopyMode<CR>
 
 " ###############################################
 " # Ignore Cached Entries in Adobe Animate File #
