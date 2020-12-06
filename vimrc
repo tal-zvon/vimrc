@@ -264,8 +264,8 @@ function ToggleCopyMode()
         let g:CopyMode = 1
         echo "Copy Mode Enabled"
 
-        :set nonumber
-        :set norelativenumber
+        :windo set nonumber
+        :windo set norelativenumber
         :GitGutterDisable
 
         if exists("g:NERDTree") && g:NERDTree.IsOpen()
@@ -296,8 +296,8 @@ function ToggleCopyMode()
         let g:CopyMode = 0
         echo "Copy Mode Disabled"
 
-        :set number
-        :set relativenumber
+        :windo set number
+        :windo set relativenumber
         :GitGutterEnable
 
         if g:NERDTreeWasOpen
