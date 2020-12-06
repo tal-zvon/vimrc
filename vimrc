@@ -64,6 +64,9 @@ set relativenumber
 " show existing tab with 4 spaces width
 set tabstop=4
 
+" When you hit tab to add 4 spaces, with this, backspace will delete 4 spaces
+set softtabstop=4
+
 " when indenting with '>', use 4 spaces width
 set shiftwidth=4
 
