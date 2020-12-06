@@ -104,6 +104,9 @@ set updatetime=100
 set foldmethod=indent
 set foldlevel=99
 
+" Restore place in file from previous session
+autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+
 " #################
 " # Mouse Support #
 " #################
