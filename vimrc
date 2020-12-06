@@ -113,6 +113,10 @@ autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "norm
 " Allow modified buffers to be in the background without warning
 set hidden
 
+" Add shortcuts for changing buffers
+nnoremap <C-N> :bnext<CR>
+nnoremap <C-P> :bprev<CR>
+
 " #################
 " # Mouse Support #
 " #################
