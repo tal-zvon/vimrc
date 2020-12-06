@@ -100,6 +100,10 @@ nnoremap q: <NOP>
 " Also controls how often vim updates git tags in gitgutter bar
 set updatetime=100
 
+" Code folding
+set foldmethod=indent
+set foldlevel=99
+
 " #################################
 " # Whitespace Highlighter Plugin #
 " #################################
