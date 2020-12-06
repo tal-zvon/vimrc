@@ -267,9 +267,9 @@ function ToggleCopyMode()
         let g:CopyMode = 1
         echo "Copy Mode Enabled"
 
-        :windo set nonumber
-        :windo set norelativenumber
-        :GitGutterDisable
+        :windo if &filetype != 'nerdtree' && &filetype != 'tagbar' | set nonumber | endif
+        :windo if &filetype != 'nerdtree' && &filetype != 'tagbar' | set norelativenumber | endif
+        :windo if &filetype != 'nerdtree' && &filetype != 'tagbar' | :GitGutterDisable | endif
 
         if exists("g:NERDTree") && g:NERDTree.IsOpen()
             let g:NERDTreeWasOpen = 1
@@ -299,9 +299,9 @@ function ToggleCopyMode()
         let g:CopyMode = 0
         echo "Copy Mode Disabled"
 
-        :windo set number
-        :windo set relativenumber
-        :GitGutterEnable
+        :windo if &filetype != 'nerdtree' && &filetype != 'tagbar' | set number | endif
+        :windo if &filetype != 'nerdtree' && &filetype != 'tagbar' | set relativenumber | endif
+        :windo if &filetype != 'nerdtree' && &filetype != 'tagbar' | :GitGutterEnable | endif
 
         if g:NERDTreeWasOpen
             :NERDTree
