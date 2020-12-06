@@ -149,6 +149,9 @@ let g:NERDTreeNodeDelimiter = "\u00a0"
 " Without this, if you close the file, NerdTree will still be open on its own
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
+" Ignore pyc files, and __pycache__ dirs
+let NERDTreeIgnore = ['\.pyc$', '__pycache__']
+
 " ###########
 " # NumLock #
 " ###########
