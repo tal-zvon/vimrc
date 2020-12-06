@@ -18,5 +18,5 @@ Shortcuts:
     Ctrl+a - Make vimdiff ignore CachedBmp files (for Adobe Animate)
     Ctrl+n - Next buffer
     Ctrl+p - Previous buffer
-    F3 - Enable-disable whitespace highlighting
+    \w - Enable-disable whitespace highlighting
         Tabs, and trailing spaces

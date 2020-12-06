@@ -142,8 +142,11 @@ endfunction
 " # Whitespace Highlighter Plugin #
 " #################################
 
-" Enable whitespace highlighting plugin
-autocmd VimEnter * ToggleSpaceHi
+" Enable whitespace highlighting plugin on all windows
+autocmd VimEnter * :silent windo ToggleSpaceHi
+
+" Add mapping for \w
+map <silent> <unique> <Leader>w :silent windo ToggleSpaceHi<CR>
 
 " ############
 " # NERDTree #
