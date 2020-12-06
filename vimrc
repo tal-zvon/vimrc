@@ -73,6 +73,11 @@ set shiftwidth=4
 " On pressing tab, insert 4 spaces
 set expandtab
 
+" Set different settings (tab is 2 spaces) for html, css and js files
+autocmd FileType html setlocal tabstop=2 shiftwidth=2 softtabstop=2
+autocmd FileType css setlocal tabstop=2 shiftwidth=2 softtabstop=2
+autocmd FileType javascript setlocal tabstop=2 shiftwidth=2 softtabstop=2
+
 " Always show the status bar
 set laststatus=2
 
