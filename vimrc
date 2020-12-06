@@ -254,12 +254,65 @@ let g:airline#extensions#tabline#enabled = 1
 " This closes everything that might get in your way
 " Note: Copy mode is just something I came up with - not a real thing
 
+let g:CopyMode = 0
+let g:NERDTreeWasOpen = 0
+let g:TagbarWasOpen = 0
+let g:MouseWasEnabled = 0
+
 function ToggleCopyMode()
-    :set number!
-    :set relativenumber!
-    :GitGutterToggle
-    :NERDTreeClose
-    :TagbarClose
+    if !g:CopyMode
+        let g:CopyMode = 1
+        echo "Copy Mode Enabled"
+
+        :set nonumber
+        :set norelativenumber
+        :GitGutterDisable
+
+        if exists("g:NERDTree") && g:NERDTree.IsOpen()
+            let g:NERDTreeWasOpen = 1
+            :NERDTreeClose
+        else
+            let g:NERDTreeWasOpen = 0
+        endif
+
+        "if 
+        "    let g:TagbarWasOpen = 1
+        "    :TagbarClose
+        "else
+        "    let g:TagbarWasOpen = 0
+        "endif
+
+        if g:is_mouse_enabled
+            " Write down that it was enabled
+            let g:MouseWasEnabled = 1
+
+            " Diable mouse
+            set mouse=
+            let g:is_mouse_enabled = 0
+        else
+            let g:MouseWasEnabled = 0
+        endif
+    else
+        let g:CopyMode = 0
+        echo "Copy Mode Disabled"
+
+        :set number
+        :set relativenumber
+        :GitGutterEnable
+
+        if g:NERDTreeWasOpen
+            :NERDTree
+        endif
+
+        if g:TagbarWasOpen
+            :TagbarOpen
+        endif
+
+        if g:MouseWasEnabled
+            set mouse=a
+            let g:is_mouse_enabled = 1
+        endif
+    endif
 endfunction
 
 " Create a command that calls the function
