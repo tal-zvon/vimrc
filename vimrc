@@ -262,6 +262,21 @@ let g:NERDTreeWasOpen = 0
 let g:TagbarWasOpen = 0
 let g:MouseWasEnabled = 0
 
+" Function that figures out if Tagbar is open
+" Returns 1 if it's open, or 0 if it's closed
+function TagbarIsOpen()
+    let windows = []
+    windo call add(windows, bufname('%'))
+
+    for item in windows
+        if stridx(item, "Tagbar") != -1
+            return 1
+        endif
+    endfor
+
+    return 0
+endfunction
+
 function ToggleCopyMode()
     if !g:CopyMode
         let g:CopyMode = 1
@@ -278,12 +293,12 @@ function ToggleCopyMode()
             let g:NERDTreeWasOpen = 0
         endif
 
-        "if 
-        "    let g:TagbarWasOpen = 1
-        "    :TagbarClose
-        "else
-        "    let g:TagbarWasOpen = 0
-        "endif
+        if TagbarIsOpen()
+            let g:TagbarWasOpen = 1
+            :TagbarClose
+        else
+            let g:TagbarWasOpen = 0
+        endif
 
         if g:is_mouse_enabled
             " Write down that it was enabled
