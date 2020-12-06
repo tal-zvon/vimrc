@@ -286,7 +286,7 @@ function ToggleCopyMode()
             " Write down that it was enabled
             let g:MouseWasEnabled = 1
 
-            " Diable mouse
+            " Disable mouse
             set mouse=
             let g:is_mouse_enabled = 0
         else
