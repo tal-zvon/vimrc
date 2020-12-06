@@ -30,7 +30,7 @@ call plug#begin('~/.vim/plugged')
     Plug 'airblade/vim-gitgutter'
 
     " Tagbar
-    Plug 'majutsushi/tagbar'
+    Plug 'preservim/tagbar'
 
     " Powerline
     Plug 'vim-airline/vim-airline'
