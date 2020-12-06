@@ -29,6 +29,9 @@ call plug#begin('~/.vim/plugged')
     " Git integration
     Plug 'airblade/vim-gitgutter'
 
+    " Tagbar
+    Plug 'majutsushi/tagbar'
+
 call plug#end()
 
 " Run PlugInstall if there are missing plugins
@@ -152,6 +155,12 @@ nnoremap OP <NOP>
 " Set color scheme
 colorscheme gruvbox
 set bg=dark
+
+" ##########
+" # Tagbar #
+" ##########
+
+map <leader>t :TagbarToggle<CR>
 
 " ###################################
 " # Easy Line Number Disable/Enable #
