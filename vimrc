@@ -223,6 +223,7 @@ set bg=dark
 " ##########
 
 map <leader>t :TagbarToggle<CR>
+autocmd FileType python :TagbarToggle
 
 " ########################################
 " # Disable Autoindent When Pasting Text #
