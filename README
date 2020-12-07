@@ -15,7 +15,7 @@ Install:
             $ brew install ctags
 
     Install my vimrc:
-        curl -sfLo ~/.vimrc https://github.com/terminator14/vimrc
+        curl -sfLo ~/.vimrc https://raw.githubusercontent.com/terminator14/vimrc/master/vimrc
 
 Shortcuts:
     \m - Enable/Disable mouse

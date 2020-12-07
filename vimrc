@@ -147,7 +147,7 @@ endfunction
 autocmd VimEnter * :silent windo ToggleSpaceHi
 
 " Add mapping for \w
-map <silent> <unique> <Leader>w :silent windo ToggleSpaceHi<CR>
+map <silent> <Leader>w :silent windo ToggleSpaceHi<CR>
 
 " ############
 " # NERDTree #
@@ -216,7 +216,7 @@ nnoremap OP <NOP>
 " ###########
 
 " Set color scheme
-colorscheme gruvbox
+silent! colorscheme gruvbox
 set bg=dark
 
 " ##########
