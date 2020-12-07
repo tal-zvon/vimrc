@@ -123,8 +123,9 @@ nnoremap <C-P> :bprev<CR>
 
 " Easy enable/disable mouse support
 
-set mouse=a
-let g:is_mouse_enabled = 1
+"set mouse=a
+let g:is_mouse_enabled = 0
+
 noremap <silent> <Leader>m :call ToggleMouse()<CR>
 function ToggleMouse()
     if g:is_mouse_enabled == 1
