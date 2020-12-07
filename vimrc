@@ -226,6 +226,10 @@ set bg=dark
 map <leader>t :TagbarToggle<CR>
 autocmd FileType python :TagbarToggle
 
+" If opening a python file, the tagbar will be the focus
+" This changes the focus on start. There may be a better way to do this
+autocmd FileType python call timer_start(100, { -> execute( "wincmd h") })
+
 " ########################################
 " # Disable Autoindent When Pasting Text #
 " ########################################
