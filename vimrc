@@ -216,7 +216,7 @@ nnoremap OP <NOP>
 " ###########
 
 " Set color scheme
-colorscheme gruvbox
+silent! colorscheme gruvbox
 set bg=dark
 
 " ##########
