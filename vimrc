@@ -2,13 +2,26 @@
 " ##### Vim-Plug #####
 " ####################
 
-" Install vim-plug if not found
-if empty(glob('~/.vim/autoload/plug.vim'))
-  silent execute "!echo Downloading and installing Vim-Plug..."
-  silent !curl -sfLo ~/.vim/autoload/plug.vim --create-dirs
-    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-  silent execute '!echo -e "    Vim-Plug installed\n"'
-  silent execute "!sleep 3"
+" Install vim-plug for vim if not found
+if !has('nvim')
+    if empty(glob('~/.vim/autoload/plug.vim'))
+      silent execute "!echo Downloading and installing Vim-Plug..."
+      silent !curl -sfLo ~/.vim/autoload/plug.vim --create-dirs
+        \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+      silent execute '!echo -e "    Vim-Plug installed\n"'
+      silent execute "!sleep 3"
+    endif
+endif
+
+" Install vim-plug for vim if not found
+if has('nvim')
+    if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
+      silent execute "!echo Downloading and installing Vim-Plug..."
+      silent !curl -sfLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs
+        \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+      silent execute '!echo -e "    Vim-Plug installed\n"'
+      silent execute "!sleep 3"
+    endif
 endif
 
 " Define plugins
