@@ -130,6 +130,10 @@ set hidden
 nnoremap <C-N> :bnext<CR>
 nnoremap <C-P> :bprev<CR>
 
+" When vsplit is used, open the new window on the right - instead
+" of the default (on the left)
+set splitright
+
 " #################
 " # Mouse Support #
 " #################
