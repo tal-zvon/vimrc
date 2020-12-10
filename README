@@ -34,7 +34,8 @@ Neovim:
         $ sudo ln -s $(which nvim) /usr/local/bin/vim
 
     Make it use the ~/.vimrc config file:
-        $ sudo ln -s ~/.vimrc ~/.config/nvim/init.vim
+        $ mkdir -p ~/.config/nvim/
+        $ ln -s ~/.vimrc ~/.config/nvim/init.vim
 
     Now, follow the regular Install instructions above
 
