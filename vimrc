@@ -61,7 +61,7 @@ autocmd VimEnter * if len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
 
 " Disable auto-indent enabled by vim-plug
 " Note: I'll try getting used to it
-"filetype indent off
+filetype indent off
 
 " Disable incremental search
 " Note: I'll try getting used to it
