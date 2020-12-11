@@ -36,6 +36,10 @@ Neovim:
     Make it use the ~/.vimrc config file:
         $ mkdir -p ~/.config/nvim/
         $ ln -s ~/.vimrc ~/.config/nvim/init.vim
+        
+    Make your system use it instead of vimdiff:
+        $ echo -e '#!/usr/bin/env bash\n\nnvim -d "$@"' | sudo tee /usr/local/bin/vimdiff
+        $ sudo chmod a+x /usr/local/bin/vimdiff
 
     Now, follow the regular Install instructions above
 
