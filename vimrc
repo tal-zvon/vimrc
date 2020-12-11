@@ -240,12 +240,18 @@ set bg=dark
 " # Tagbar #
 " ##########
 
+" Make \t toggle Tagbar
 map <leader>t :TagbarToggle<CR>
-autocmd FileType python :TagbarToggle
 
-" If opening a python file, the tagbar will be the focus
-" This changes the focus on start. There may be a better way to do this
-autocmd FileType python call timer_start(100, { -> execute( "wincmd h") })
+" If we're not open in vimdiff, and the filetype is Python,
+" open Tagbar automatically
+if ! &diff
+    autocmd FileType python :TagbarToggle
+
+    " If opening a python file, the tagbar will be the focus
+    " This changes the focus on start. There may be a better way to do this
+    autocmd FileType python call timer_start(100, { -> execute( "wincmd h") })
+endif
 
 " ########################################
 " # Disable Autoindent When Pasting Text #
