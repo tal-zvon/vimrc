@@ -243,14 +243,9 @@ set bg=dark
 " Make \t toggle Tagbar
 map <leader>t :TagbarToggle<CR>
 
-function! OpenTagbar()
-    :TagbarToggle
-    wincmd h
-endfunction
-
 " If we're not open in vimdiff, and the filetype is Python,
 " open Tagbar automatically
-autocmd VimEnter * if !&diff && winnr('$') == 1 && &filetype ==# 'python' | execute 'call OpenTagbar()' | endif
+autocmd VimEnter * if !&diff && winnr('$') == 1 && &filetype ==# 'python' | execute 'TagbarToggle' | endif
 
 " ########################################
 " # Disable Autoindent When Pasting Text #
