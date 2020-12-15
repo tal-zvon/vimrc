@@ -37,6 +37,9 @@ Neovim:
         $ mkdir -p ~/.config/nvim/
         $ ln -s ~/.vimrc ~/.config/nvim/init.vim
         
+        $ sudo mkdir -p /root/.config/nvim/
+        $ sudo ln -s /root/.vimrc /root/.config/nvim/init.vim
+        
     Make your system use it instead of vimdiff:
         $ echo -e '#!/usr/bin/env bash\n\nnvim -d "$@"' | sudo tee /usr/local/bin/vimdiff
         $ sudo chmod a+x /usr/local/bin/vimdiff
