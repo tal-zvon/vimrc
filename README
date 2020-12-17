@@ -4,49 +4,11 @@ Automatically installs Vim-Plug, and any plugins I need before configuring
 them.
 
 Install:
-    Install ctags:
-        Debian:
-            $ sudo apt-get install ctags
 
-        CentOS:
-            $ sudo dnf install ctags
-
-        MacOS:
-            $ brew install ctags
-
-    Install my vimrc:
-        curl -sfLo ~/.vimrc https://raw.githubusercontent.com/tal-zvon/vimrc/master/vimrc
-
-Neovim:
-    If you'd rather use neovim, do this:
-
-    Install neovim:
-        Debian:
-            $ sudo apt-get install neovim
-
-        CentOS:
-            $ sudo dnf install neovim
-
-        MacOS:
-            $ brew install neovim
-
-    Make it default:
-        $ sudo ln -s $(which nvim) /usr/local/bin/vim
-
-    Make it use the ~/.vimrc config file:
-        $ mkdir -p ~/.config/nvim/
-        $ ln -s ~/.vimrc ~/.config/nvim/init.vim
-        
-        $ sudo mkdir -p /root/.config/nvim/
-        $ sudo ln -s /root/.vimrc /root/.config/nvim/init.vim
-        
-    Make your system use it instead of vimdiff:
-        $ echo -e '#!/usr/bin/env bash\n\nnvim -d "$@"' | sudo tee /usr/local/bin/vimdiff
-        $ sudo chmod a+x /usr/local/bin/vimdiff
-
-    Now, follow the regular Install instructions above
+    sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/tal-zvon/vimrc/master/install.sh)"
 
 Shortcuts:
+
     \m - Enable/Disable mouse
     \n - Enable/Disable NERDTree
     \t - Enable/Disable Tagbar
