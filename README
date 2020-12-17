@@ -15,7 +15,7 @@ Install:
             $ brew install ctags
 
     Install my vimrc:
-        curl -sfLo ~/.vimrc https://raw.githubusercontent.com/terminator14/vimrc/master/vimrc
+        curl -sfLo ~/.vimrc https://raw.githubusercontent.com/tal-zvon/vimrc/master/vimrc
 
 Neovim:
     If you'd rather use neovim, do this:
@@ -34,7 +34,15 @@ Neovim:
         $ sudo ln -s $(which nvim) /usr/local/bin/vim
 
     Make it use the ~/.vimrc config file:
-        $ sudo ln -s ~/.vimrc ~/.config/nvim/init.vim
+        $ mkdir -p ~/.config/nvim/
+        $ ln -s ~/.vimrc ~/.config/nvim/init.vim
+        
+        $ sudo mkdir -p /root/.config/nvim/
+        $ sudo ln -s /root/.vimrc /root/.config/nvim/init.vim
+        
+    Make your system use it instead of vimdiff:
+        $ echo -e '#!/usr/bin/env bash\n\nnvim -d "$@"' | sudo tee /usr/local/bin/vimdiff
+        $ sudo chmod a+x /usr/local/bin/vimdiff
 
     Now, follow the regular Install instructions above
 
