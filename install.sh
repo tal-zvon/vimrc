@@ -52,6 +52,8 @@ fi
 # Install Requirements #
 ########################
 
+# Note: Even if install fails, we keep going
+
 echo
 echo "***************************************"
 echo "* Installing ctags, vim and neovim... *"
@@ -60,8 +62,14 @@ echo
 
 $INSTALL_COMMAND ctags vim neovim
 
-echo
-echo Installed
+if [[ "$?" == "0" ]]
+then
+    echo
+    echo Installed
+else
+    echo
+    echo Install FAILED
+fi
 
 #######################
 # Make Neovim Default #
