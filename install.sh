@@ -53,12 +53,12 @@ fi
 ########################
 
 echo
-echo "***************************************"
-echo "* Installing ctags, vim and neovim... *"
-echo "***************************************"
+echo "********************************************"
+echo "* Installing ctags, git, vim and neovim... *"
+echo "********************************************"
 echo
 
-$INSTALL_COMMAND ctags vim neovim
+$INSTALL_COMMAND ctags vim neovim git
 
 echo
 echo Installed
