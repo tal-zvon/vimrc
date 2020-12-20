@@ -17,13 +17,19 @@ fi
 # Set Some Vars #
 #################
 
+# Note: Loop through these like:
+#   for user in "${!USERS[@]}"
+#   do
+#       HOME_DIR=${USERS[$user]}
+#   done
+#
+#   Where 'user' is the username, and 'HOME_DIR' is the home directory
+
 if [[ -n "$SUDO_USER" ]]
 then
-    USERS="root $SUDO_USER"
-    HOME_DIRS="$(eval echo ~root) $(eval echo ~$SUDO_USER)"
+    declare -A USERS=( [root]=$(eval echo ~root) [$SUDO_USER]=$(eval echo ~$SUDO_USER) )
 else
-    USERS="root"
-    HOME_DIRS="$(eval echo ~root)"
+    declare -A USERS=( [root]=$(eval echo ~root) )
 fi
 
 ##########################
@@ -31,6 +37,7 @@ fi
 ##########################
 
 if which brew >/dev/null 2>&1; then
+    # Homebrew needs to run as local user
     if [[ -n "$SUDO_USER" ]]
     then
         INSTALL_COMMAND="sudo -u $SUDO_USER brew install"
@@ -98,12 +105,14 @@ echo "* Making Neovim Use ~/.vimrc *"
 echo "******************************"
 echo
 
-for HOME_DIR in $HOME_DIRS
+for user in "${!USERS[@]}"
 do
+    HOME_DIR=${USERS[$user]}
+
     if [[ ! -e "$HOME_DIR/.config/nvim/init.vim" ]]
     then
-        mkdir -p "$HOME_DIR/.config/nvim/"
-        ln -sf "$HOME_DIR/.vimrc" "$HOME_DIR/.config/nvim/init.vim"
+        sudo -u $user mkdir -p "$HOME_DIR/.config/nvim/"
+        sudo -u $user ln -sf "$HOME_DIR/.vimrc" "$HOME_DIR/.config/nvim/init.vim"
     fi
 
     echo Done for $HOME_DIR
@@ -135,8 +144,10 @@ echo "* Removing Old .vimrc and Plugins *"
 echo "***********************************"
 echo
 
-for HOME_DIR in $HOME_DIRS
+for user in "${!USERS[@]}"
 do
+    HOME_DIR=${USERS[$user]}
+
     rm -f "$HOME_DIR/.vimrc"
     rm -rf "$HOME_DIR/.vim"
     echo Done for $HOME_DIR
@@ -152,9 +163,11 @@ echo "* Installing vimrc *"
 echo "********************"
 echo
 
-for HOME_DIR in $HOME_DIRS
+for user in "${!USERS[@]}"
 do
-    curl -sfLo "$HOME_DIR/.vimrc" https://raw.githubusercontent.com/tal-zvon/vimrc/master/vimrc
+    HOME_DIR=${USERS[$user]}
+
+    sudo -u $user curl -sfLo "$HOME_DIR/.vimrc" https://raw.githubusercontent.com/tal-zvon/vimrc/master/vimrc
     echo Done for $HOME_DIR
 done
 
@@ -168,7 +181,7 @@ echo "* Installing Plugins *"
 echo "**********************"
 echo
 
-for user in $USERS
+for user in "${!USERS[@]}"
 do
     sudo -u $user vim +PlugInstall +qall
     sudo -u $user nvim +PlugInstall +qall
