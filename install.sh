@@ -82,7 +82,7 @@ then
     echo "* Making Neovim Default *"
     echo "*************************"
 
-    ln -s $(which nvim) /usr/local/bin/vim
+    ln -sf $(which nvim) /usr/local/bin/vim
 
     echo
     echo Done
@@ -103,7 +103,7 @@ do
     if [[ ! -e "$HOME_DIR/.config/nvim/init.vim" ]]
     then
         mkdir -p "$HOME_DIR/.config/nvim/"
-        ln -s "$HOME_DIR/.vimrc" "$HOME_DIR/.config/nvim/init.vim"
+        ln -sf "$HOME_DIR/.vimrc" "$HOME_DIR/.config/nvim/init.vim"
     fi
 
     echo Done for $HOME_DIR
