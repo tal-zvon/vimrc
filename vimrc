@@ -134,6 +134,9 @@ nnoremap <C-P> :bprev<CR>
 " of the default (on the left)
 set splitright
 
+" Set encoding
+set encoding=utf8
+
 " #################
 " # Mouse Support #
 " #################
