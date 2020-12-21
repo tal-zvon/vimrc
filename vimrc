@@ -250,6 +250,10 @@ map <leader>t :TagbarToggle<CR>
 " open Tagbar automatically
 autocmd VimEnter * if !&diff && winnr('$') == 1 && &filetype ==# 'python' | execute 'TagbarToggle' | endif
 
+" Disable sorting
+" With this, items appear as they do in the file, instead of sorted by name
+let g:tagbar_sort = 0
+
 " ########################################
 " # Disable Autoindent When Pasting Text #
 " ########################################
