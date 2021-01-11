@@ -137,6 +137,12 @@ set splitright
 " Set encoding
 set encoding=utf8
 
+" Set text width
+" For gt and gw, the number of characters to consider a single line
+" 75 replicates GNU fmt, and works well. The default is too long in
+" my vim, where I have a gutter with line numbers showing
+set textwidth=75
+
 " #################
 " # Mouse Support #
 " #################
