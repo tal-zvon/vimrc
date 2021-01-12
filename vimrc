@@ -141,7 +141,10 @@ set encoding=utf8
 " For gt and gw, the number of characters to consider a single line
 " 75 replicates GNU fmt, and works well. The default is too long in
 " my vim, where I have a gutter with line numbers showing
+" Note: Setting textwidth also enables automatic newlines as you type.
+" fo-=tc disables that. See: https://vi.stackexchange.com/a/28725/32517
 set textwidth=75
+set fo-=tc
 
 " #################
 " # Mouse Support #
