@@ -146,6 +146,13 @@ set encoding=utf8
 set textwidth=75
 set fo-=tc
 
+" Change Auto-Complete Mode
+" This is when you type ":e WORD" and hit tab
+" The default will complete the first possibly guess, instead
+" of just before the first ambiguous character like bash does
+" This makes it closer to bash
+set wildmode=longest:full,list:full
+
 " #################
 " # Mouse Support #
 " #################
