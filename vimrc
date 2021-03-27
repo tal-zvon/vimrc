@@ -295,6 +295,20 @@ let g:tagbar_sort = 0
 " Show buffers at the top
 let g:airline#extensions#tabline#enabled = 1
 
+" ###############################
+" # Copy to Clipboard Shortcuts #
+" ###############################
+
+" Copy to clipboard
+vnoremap  <leader>y  "+y
+nnoremap  <leader>Y  "+yg_
+nnoremap  <leader>y  "+y
+
+" Paste from clipboard
+nnoremap <leader>p "+p
+nnoremap <leader>P "+P
+vnoremap <leader>p "+p
+vnoremap <leader>P "+P
 
 " ################
 " # Buffer Close #
