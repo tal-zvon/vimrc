@@ -78,11 +78,22 @@ else
     echo Install FAILED
 fi
 
+#################################
+# Check if Neovim was Installed #
+#################################
+
+if which nvim >/dev/null 2>/dev/null
+then
+    NVIM_INSTALLED=true
+else
+    NVIM_INSTALLED=false
+fi
+
 #######################
 # Make Neovim Default #
 #######################
 
-if [[ ! -e "/usr/local/bin/vim" ]]
+if $NVIM_INSTALLED && [[ ! -e "/usr/local/bin/vim" ]]
 then
     echo
     echo "*************************"
@@ -99,30 +110,33 @@ fi
 # Make Neovim use the ~/.vimrc config file #
 ############################################
 
-echo
-echo "******************************"
-echo "* Making Neovim Use ~/.vimrc *"
-echo "******************************"
-echo
+if $NVIM_INSTALLED
+then
+    echo
+    echo "******************************"
+    echo "* Making Neovim Use ~/.vimrc *"
+    echo "******************************"
+    echo
 
-for user in "${!USERS[@]}"
-do
-    HOME_DIR=${USERS[$user]}
+    for user in "${!USERS[@]}"
+    do
+        HOME_DIR=${USERS[$user]}
 
-    if [[ ! -e "$HOME_DIR/.config/nvim/init.vim" ]]
-    then
-        sudo -u $user mkdir -p "$HOME_DIR/.config/nvim/"
-        sudo -u $user ln -sf "$HOME_DIR/.vimrc" "$HOME_DIR/.config/nvim/init.vim"
-    fi
+        if [[ ! -e "$HOME_DIR/.config/nvim/init.vim" ]]
+        then
+            sudo -u $user mkdir -p "$HOME_DIR/.config/nvim/"
+            sudo -u $user ln -sf "$HOME_DIR/.vimrc" "$HOME_DIR/.config/nvim/init.vim"
+        fi
 
-    echo Done for $HOME_DIR
-done
+        echo Done for $HOME_DIR
+    done
+fi
 
 ###############################
 # Replace Vimdiff with Neovim #
 ###############################
 
-if [[ ! -e "/usr/local/bin/vimdiff" ]]
+if $NVIM_INSTALLED && [[ ! -e "/usr/local/bin/vimdiff" ]]
 then
     echo
     echo "*********************************"
@@ -183,7 +197,36 @@ echo
 
 for user in "${!USERS[@]}"
 do
+    # Create ~/.vim and set its owner, in case it wasn't set
+    # Not sure why this is necessary, but it was - my original code was
+    # creating ~/.vim as the root user for some reason
+    sudo -u $user mkdir -p "$HOME_DIR/.vim"
+    sudo chown $user "$HOME_DIR/.vim"
+
+    # Install plugins with vim
     sudo -u $user vim +PlugInstall +qall
-    sudo -u $user nvim +PlugInstall +qall
+
+    # Install plugins with nvim, if present
+    if $NVIM_INSTALLED
+    then
+        sudo -u $user nvim +PlugInstall +qall
+    fi
+
+    # Fix ALL permissions under ~/.vim
+    sudo chown -R $user "$HOME_DIR/.vim"
+
     echo Installed for $user
 done
+
+###########################
+# Warn If Nvim is Missing #
+###########################
+
+if ! $NVIM_INSTALLED
+then
+    echo
+    echo "*************************************"
+    echo "* WARNING: FAILED TO INSTALL NEOVIM *"
+    echo "*************************************"
+    echo
+fi
