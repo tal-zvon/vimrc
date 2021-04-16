@@ -317,6 +317,98 @@ nnoremap <leader>P "+P
 vnoremap <leader>p "+p
 vnoremap <leader>P "+P
 
+" #############
+" # Copy Mode #
+" #############
+
+" Ctrl-C to enter/exit copy mode
+" Useful if you want to copy something to clipboard
+" This closes everything that might get in your way
+" Note: Copy mode is just something I came up with - not a real thing
+
+let g:CopyMode = 0
+let g:NERDTreeWasOpen = 0
+let g:TagbarWasOpen = 0
+let g:MouseWasEnabled = 0
+
+" Function that figures out if Tagbar is open
+" Returns 1 if it's open, or 0 if it's closed
+function TagbarIsOpen()
+    let windows = []
+    windo call add(windows, bufname('%'))
+
+    for item in windows
+        if stridx(item, "Tagbar") != -1
+            return 1
+        endif
+    endfor
+
+    return 0
+endfunction
+
+function ToggleCopyMode()
+    if !g:CopyMode
+        let g:CopyMode = 1
+        echo "Copy Mode Enabled"
+
+        :windo if &filetype != 'nerdtree' && &filetype != 'tagbar' | set nonumber | endif
+        :windo if &filetype != 'nerdtree' && &filetype != 'tagbar' | set norelativenumber | endif
+        :windo if &filetype != 'nerdtree' && &filetype != 'tagbar' | :GitGutterDisable | endif
+
+        if exists("g:NERDTree") && g:NERDTree.IsOpen()
+            let g:NERDTreeWasOpen = 1
+            :NERDTreeClose
+        else
+            let g:NERDTreeWasOpen = 0
+        endif
+
+        if TagbarIsOpen()
+            let g:TagbarWasOpen = 1
+            :TagbarClose
+        else
+            let g:TagbarWasOpen = 0
+        endif
+
+        if g:is_mouse_enabled
+            " Write down that it was enabled
+            let g:MouseWasEnabled = 1
+
+            " Disable mouse
+            set mouse=
+            let g:is_mouse_enabled = 0
+        else
+            let g:MouseWasEnabled = 0
+        endif
+    else
+        let g:CopyMode = 0
+        echo "Copy Mode Disabled"
+
+        :windo if &filetype != 'nerdtree' && &filetype != 'tagbar' | set number | endif
+        :windo if &filetype != 'nerdtree' && &filetype != 'tagbar' | set relativenumber | endif
+        :windo if &filetype != 'nerdtree' && &filetype != 'tagbar' | :GitGutterEnable | endif
+
+        if g:NERDTreeWasOpen
+            :NERDTree
+        endif
+
+        if g:TagbarWasOpen
+            :TagbarOpen
+        endif
+
+        if g:MouseWasEnabled
+            set mouse=a
+            let g:is_mouse_enabled = 1
+        endif
+    endif
+endfunction
+
+" Create a command that calls the function
+" Without this, you'd need to run ":call ToggleCopyMode" in vim
+command! ToggleCopyMode call ToggleCopyMode()
+
+" If you click Ctrl+L, run :ToggleLineNumbers
+nnoremap <C-C> :ToggleCopyMode<CR>
+
 " ################
 " # Buffer Close #
 " ################
