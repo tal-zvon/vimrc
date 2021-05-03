@@ -182,6 +182,13 @@ do
     HOME_DIR=${USERS[$user]}
 
     sudo -u $user curl -sfLo "$HOME_DIR/.vimrc" https://raw.githubusercontent.com/tal-zvon/vimrc/master/vimrc
+
+    # If the script specified -q, skip coc warnings
+    if [[ "$1" == "-q" ]]
+    then
+        echo 'let g:coc_disable_startup_warning = 1' >> "$HOME_DIR/.vimrc"
+    fi
+
     echo Done for $HOME_DIR
 done
 
