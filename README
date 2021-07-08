@@ -9,7 +9,8 @@ Install:
     
 Optional Args:
 
-    Add --with-rust to install support for Rust. This may not work on older distributions, like Raspbian, or CentOS because their nvim version is too old.
+    Add --with-rust to install support for Rust. This may not work on older distributions, like
+    Raspbian, or CentOS because their nvim version is too old.
 
 Shortcuts:
 
