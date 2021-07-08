@@ -204,6 +204,8 @@ echo
 
 for user in "${!USERS[@]}"
 do
+    HOME_DIR=${USERS[$user]}
+    
     # Create ~/.vim and set its owner, in case it wasn't set
     # Not sure why this is necessary, but it was - my original code was
     # creating ~/.vim as the root user for some reason
