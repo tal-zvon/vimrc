@@ -51,7 +51,7 @@ elif which dnf >/dev/null 2>&1; then
 elif which yum >/dev/null 2>&1; then
     INSTALL_COMMAND="yum -y install"
 elif which pacman >/dev/null 2>&1; then
-    INSTALL_COMMAND="pacman -S"
+    INSTALL_COMMAND="pacman --noconfirm -S"
 else
     echo "ERROR: Package manager not found"
     exit 1
