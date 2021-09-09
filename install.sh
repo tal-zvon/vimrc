@@ -186,9 +186,9 @@ do
     sudo -u $user curl -sfLo "$HOME_DIR/.vimrc" https://raw.githubusercontent.com/tal-zvon/vimrc/master/vimrc
 
     # Unless the script specified --with-rust, skip installing coc, or coc-rust-analyzer
-    if [[ "$1" != "--with-rust" ]]
+    if [[ "$1" == "--with-rust" ]]
     then
-        sudo -u $user sed -i 's/\(Plug.*coc.*\)/"\1/g' "$HOME_DIR/.vimrc"
+        sudo -u $user sed -i 's/"\(Plug.*coc.*\)/\1/g' "$HOME_DIR/.vimrc"
     fi
 
     echo Done for $HOME_DIR

@@ -49,10 +49,10 @@ call plug#begin('~/.vim/plugged')
     Plug 'vim-airline/vim-airline'
 
     " Coc
-    Plug 'neoclide/coc.nvim'
+    "Plug 'neoclide/coc.nvim'
 
     " Coc Rust Analyzer
-    Plug 'fannheyward/coc-rust-analyzer'
+    "Plug 'fannheyward/coc-rust-analyzer'
 
 call plug#end()
 
