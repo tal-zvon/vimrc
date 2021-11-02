@@ -190,7 +190,7 @@ endfunction
 autocmd VimEnter * :silent windo ToggleSpaceHi
 
 " Add mapping for \w
-map <silent> <Leader>w :silent windo ToggleSpaceHi<CR>
+map <silent> <Leader>w :silent Windofast ToggleSpaceHi<CR>
 
 " ############
 " # NERDTree #
@@ -533,3 +533,28 @@ command! AA call AA()
 
 " If you hit \a, run :AA
 map <leader>a :AA<CR>
+
+" ##############################
+" # Define WinDo and Windofast #
+" ##############################
+
+" Source: https://vim.fandom.com/wiki/Windo_and_restore_current_window
+
+" I use a plugin to enable/disable whitespace highlighting. I have a
+" keyboard mapping, where if I hit \w, it toggles this on all the windows
+" in my current tab. It normally does this using 'windo'. The problem with
+" 'windo' is that when it's done, the active buffer is changed to the last
+" one. That means if my first buffer was active, and I hit \w, it will
+" switch buffers, which is annoying.  The functions below restore the
+" active buffer after 'windo' is done.
+
+" Just like windo, but restore the current window when done.
+function! WinDo(command)
+  let currwin=winnr()
+  execute 'windo ' . a:command
+  execute currwin . 'wincmd w'
+endfunction
+com! -nargs=+ -complete=command Windo call WinDo(<q-args>)
+
+" Just like Windo, but disable all autocommands for super fast processing.
+com! -nargs=+ -complete=command Windofast noautocmd call WinDo(<q-args>)
