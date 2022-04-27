@@ -558,3 +558,13 @@ com! -nargs=+ -complete=command Windo call WinDo(<q-args>)
 
 " Just like Windo, but disable all autocommands for super fast processing.
 com! -nargs=+ -complete=command Windofast noautocmd call WinDo(<q-args>)
+
+" ##############################
+" # Resync Syntax Highlighting #
+" ##############################
+
+" Source: https://stackoverflow.com/questions/8674387/vim-how-to-reload-syntax-highlighting
+" Set F12 to resync syntax highlighting
+
+noremap <F12> <Esc>:syntax sync fromstart<CR>
+inoremap <F12> <C-o>:syntax sync fromstart<CR>
