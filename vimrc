@@ -568,3 +568,15 @@ com! -nargs=+ -complete=command Windofast noautocmd call WinDo(<q-args>)
 
 noremap <F12> <Esc>:syntax sync fromstart<CR>
 inoremap <F12> <C-o>:syntax sync fromstart<CR>
+
+" ############
+" # Terminal #
+" ############
+
+" Set :terminal scrollback size to max size supported (100,000 lines)
+" Note: this command doesn't work in regular vim - only neovim,
+"   so we make sure vim ignores it
+
+if has('nvim')
+  set scrollback=100000
+endif
