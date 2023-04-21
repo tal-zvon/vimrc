@@ -166,7 +166,7 @@ set wildmode=longest:full,list:full
 
 " Easy enable/disable mouse support
 
-"set mouse=a
+set mouse=
 let g:is_mouse_enabled = 0
 
 noremap <silent> <Leader>m :call ToggleMouse()<CR>
