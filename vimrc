@@ -160,6 +160,11 @@ set fo-=tc
 " This makes it closer to bash
 set wildmode=longest:full,list:full
 
+" Allow backspace
+" In MacOS, backspace by default only deletes what was typed during your
+" current insert mode session. This allows it to delete to start of line
+set backspace=indent,eol,start
+
 " #################
 " # Mouse Support #
 " #################
