@@ -9,7 +9,7 @@
 
 if [[ "$(id -u)" != 0 ]]
 then
-    echo "ERROR: Must run as root"
+    echo "ERROR: Must run as root" >&2
     exit 1
 fi
 
@@ -36,22 +36,29 @@ fi
 # Detect Package Manager #
 ##########################
 
-if which brew >/dev/null 2>&1; then
-    # Homebrew needs to run as local user
+if command -v brew >/dev/null 2>&1; then
+    PACKAGE_MANAGER="brew"
     if [[ -n "$SUDO_USER" ]]
     then
         INSTALL_COMMAND="sudo -u $SUDO_USER brew install"
     else
         INSTALL_COMMAND="brew install"
     fi
-elif which apt-get >/dev/null 2>&1; then
+elif command -v apt-get >/dev/null 2>&1; then
+    PACKAGE_MANAGER="apt"
     INSTALL_COMMAND="apt-get -y install"
-elif which dnf >/dev/null 2>&1; then
+elif command -v dnf >/dev/null 2>&1; then
+    PACKAGE_MANAGER="dnf"
     INSTALL_COMMAND="dnf -y install"
-elif which yum >/dev/null 2>&1; then
+elif command -v yum >/dev/null 2>&1; then
+    PACKAGE_MANAGER="yum"
     INSTALL_COMMAND="yum -y install"
-elif which pacman >/dev/null 2>&1; then
+elif command -v pacman >/dev/null 2>&1; then
+    PACKAGE_MANAGER="pacman"
     INSTALL_COMMAND="pacman --noconfirm -S"
+elif command -v apk >/dev/null 2>&1; then
+    PACKAGE_MANAGER="apk"
+    INSTALL_COMMAND="apk add --no-cache"
 else
     echo "ERROR: Package manager not found"
     exit 1
@@ -61,30 +68,64 @@ fi
 # Install Requirements #
 ########################
 
-# Note: Even if install fails, we keep going
-
 echo
-echo "********************************************"
-echo "* Installing ctags, git, vim and neovim... *"
-echo "********************************************"
+echo "***************************"
+echo "* Installing Requirements *"
+echo "***************************"
 echo
 
-$INSTALL_COMMAND ctags vim neovim git
+case "$PACKAGE_MANAGER" in
+    apt)
+        PACKAGES=(
+            neovim git fzf lazygit
+            fd-find curl ripgrep
+            wget luarocks
+        )
+        ;;
+    dnf|yum)
+        PACKAGES=(
+            neovim git fzf lazygit
+            fd-find curl ripgrep
+            wget luarocks
+        )
+        ;;
+    pacman)
+        PACKAGES=(
+            neovim git fzf lazygit
+            fd curl ripgrep
+            wget luarocks
+        )
+        ;;
+    apk)
+        PACKAGES=(
+            neovim git fzf
+            fd curl ripgrep
+            wget luarocks
+        )
+        ;;
+    brew)
+        PACKAGES=(
+            neovim git fzf lazygit
+            fd ripgrep
+            wget luarocks
+        )
+        ;;
+esac
 
-if [[ "$?" == "0" ]]
-then
-    echo
-    echo Installed
-else
-    echo
-    echo Install FAILED
-fi
+for pkg in "${PACKAGES[@]}"
+do
+    echo Installing $pkg...
+    $INSTALL_COMMAND "$pkg" >/dev/null 2>&1 || echo "  -> Skipped $pkg"
+done
+
+echo
+echo Done
 
 #################################
 # Check if Neovim was Installed #
 #################################
 
-if which nvim >/dev/null 2>/dev/null
+if command -v nvim >/dev/null 2>/dev/null
 then
     NVIM_INSTALLED=true
 else
@@ -102,36 +143,10 @@ then
     echo "* Making Neovim Default *"
     echo "*************************"
 
-    ln -sf $(which nvim) /usr/local/bin/vim
+    ln -sf $(command -v nvim) /usr/local/bin/vim
 
     echo
     echo Done
-fi
-
-############################################
-# Make Neovim use the ~/.vimrc config file #
-############################################
-
-if $NVIM_INSTALLED
-then
-    echo
-    echo "******************************"
-    echo "* Making Neovim Use ~/.vimrc *"
-    echo "******************************"
-    echo
-
-    for user in "${!USERS[@]}"
-    do
-        HOME_DIR=${USERS[$user]}
-
-        if [[ ! -e "$HOME_DIR/.config/nvim/init.vim" ]]
-        then
-            sudo -u $user mkdir -p "$HOME_DIR/.config/nvim/"
-            sudo -u $user ln -sf "$HOME_DIR/.vimrc" "$HOME_DIR/.config/nvim/init.vim"
-        fi
-
-        echo Done for $HOME_DIR
-    done
 fi
 
 ###############################
@@ -166,67 +181,47 @@ do
 
     rm -f "$HOME_DIR/.vimrc"
     rm -rf "$HOME_DIR/.vim"
+    rm -rf "$HOME_DIR/.config/nvim"
+    rm -rf "$HOME_DIR/.local/share/nvim"
+    rm -rf "$HOME_DIR/.local/state/nvim"
     echo Done for $HOME_DIR
 done
 
-#################
-# Install Vimrc #
-#################
+#########################
+# Install Neovim Config #
+#########################
 
 echo
-echo "********************"
-echo "* Installing vimrc *"
-echo "********************"
+echo "****************************"
+echo "* Installing Neovim Config *"
+echo "****************************"
 echo
 
 for user in "${!USERS[@]}"
 do
     HOME_DIR=${USERS[$user]}
+    CONFIG_DIR="$HOME_DIR/.config"
+    NVIM_DIR="$CONFIG_DIR/nvim"
 
-    sudo -u $user curl -sfLo "$HOME_DIR/.vimrc" https://raw.githubusercontent.com/tal-zvon/vimrc/master/vimrc
+    echo Installing config for $HOME_DIR...
 
-    # Unless the script specified --with-rust, skip installing coc, or coc-rust-analyzer
-    if [[ "$1" == "--with-rust" ]]
-    then
-        sudo -u $user sed -i 's/"\(Plug.*coc.*\)/\1/g' "$HOME_DIR/.vimrc"
+    sudo -u "$user" mkdir -p "$CONFIG_DIR"
+
+    if [[ -d "$NVIM_DIR/.git" ]]; then
+        sudo -u "$user" git -C "$NVIM_DIR" pull
+    else
+        sudo -u "$user" git clone \
+            --depth 1 \
+            --filter=blob:none \
+            --sparse \
+            https://github.com/tal-zvon/vimrc.git \
+            "$NVIM_DIR"
+
+        sudo -u "$user" git -C "$NVIM_DIR" sparse-checkout set nvim
+        sudo -u "$user" bash -c "cd '$NVIM_DIR' && mv nvim/* . && rm -rf nvim"
     fi
 
     echo Done for $HOME_DIR
-done
-
-###################
-# Install Plugins #
-###################
-
-echo
-echo "**********************"
-echo "* Installing Plugins *"
-echo "**********************"
-echo
-
-for user in "${!USERS[@]}"
-do
-    HOME_DIR=${USERS[$user]}
-    
-    # Create ~/.vim and set its owner, in case it wasn't set
-    # Not sure why this is necessary, but it was - my original code was
-    # creating ~/.vim as the root user for some reason
-    sudo -u $user mkdir -p "$HOME_DIR/.vim"
-    sudo chown $user "$HOME_DIR/.vim"
-
-    # Install plugins with vim
-    sudo -u $user vim +PlugInstall +qall
-
-    # Install plugins with nvim, if present
-    if $NVIM_INSTALLED
-    then
-        sudo -u $user nvim +PlugInstall +qall
-    fi
-
-    # Fix ALL permissions under ~/.vim
-    sudo chown -R $user "$HOME_DIR/.vim"
-
-    echo Installed for $user
 done
 
 ###########################

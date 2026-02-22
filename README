@@ -1,29 +1,13 @@
-My .vimrc file
+My neovim config
 
-Automatically installs Vim-Plug, and any plugins I need before configuring
+Automatically installs LazyVim, and any plugins I need before configuring
 them.
 
 Install:
 
-    sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/tal-zvon/vimrc/master/install.sh)"
+    sudo bash -c "$(curl -H 'Cache-Control: no-cache' -fsSL https://raw.githubusercontent.com/tal-zvon/vimrc/master/install.sh)"
     
 Optional Args:
 
     Add --with-rust to install support for Rust. This may not work on older distributions, like
     Raspbian, or CentOS because their nvim version is too old.
-
-Shortcuts:
-
-    \m - Enable/Disable mouse
-    \n - Enable/Disable NERDTree
-    \t - Enable/Disable Tagbar
-    \c - Enable/Disable Copy Mode
-        Makes it easy to copy lines
-
-        Hides line numbers, NERDTree, Tagbar, Git Gutter, and disables
-        Mouse
-    \a - Make vimdiff ignore CachedBmp files (for Adobe Animate)
-    Ctrl+n - Next buffer
-    Ctrl+p - Previous buffer
-    \w - Enable-disable whitespace highlighting
-        Tabs, and trailing spaces
