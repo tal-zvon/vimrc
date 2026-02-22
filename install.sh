@@ -200,25 +200,18 @@ echo
 for user in "${!USERS[@]}"
 do
     HOME_DIR=${USERS[$user]}
-    CONFIG_DIR="$HOME_DIR/.config"
-    NVIM_DIR="$CONFIG_DIR/nvim"
+    NVIM_DIR="$HOME_DIR/.config/nvim"
 
     echo Installing config for $HOME_DIR...
 
-    sudo -u "$user" mkdir -p "$CONFIG_DIR"
+    sudo -u "$user" mkdir -p "$HOME_DIR/.config"
 
     if [[ -d "$NVIM_DIR/.git" ]]; then
         sudo -u "$user" git -C "$NVIM_DIR" pull
     else
         sudo -u "$user" git clone \
-            --depth 1 \
-            --filter=blob:none \
-            --sparse \
             https://github.com/tal-zvon/vimrc.git \
             "$NVIM_DIR"
-
-        sudo -u "$user" git -C "$NVIM_DIR" sparse-checkout set nvim
-        sudo -u "$user" bash -c "cd '$NVIM_DIR' && mv nvim/* . && rm -rf nvim"
     fi
 
     echo Done for $HOME_DIR
