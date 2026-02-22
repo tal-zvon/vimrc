@@ -15,11 +15,19 @@ local function now_epoch()
 end
 
 local function notify(message, level)
+  -- LazyVim.notify(msg, opts) where opts.level is the level
   if _G.LazyVim and type(_G.LazyVim.notify) == "function" then
-    _G.LazyVim.notify(message, level, { title = NOTIFY_TITLE })
-  else
-    vim.notify(message, level, { title = NOTIFY_TITLE })
+    local ok = pcall(_G.LazyVim.notify, message, {
+      title = NOTIFY_TITLE,
+      level = level,
+    })
+    if ok then
+      return
+    end
   end
+
+  -- Fallback: vim.notify(msg, level, opts)
+  pcall(vim.notify, message, level, { title = NOTIFY_TITLE })
 end
 
 local function ensure_state_directory_exists()
