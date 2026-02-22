@@ -1,4 +1,5 @@
 local o = vim.opt
+local g = vim.g
 
 -- #####################
 -- ##### My config #####
@@ -27,6 +28,9 @@ o.formatoptions:remove({ "t", "c" })
 
 -- Disable auto-comment on Enter and on o/O
 o.formatoptions:remove({ "r", "o" })
+
+-- Disable automatic formatting on save
+g.autoformat = false
 
 -- Don't keep an undo file so undo history is in RAM only
 o.undofile = false
