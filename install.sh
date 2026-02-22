@@ -44,7 +44,7 @@ get_home_dir() {
     # Linux
     if command -v getent >/dev/null 2>&1; then
         local home_dir
-        home_dir="$(getent passwd "$username" | awk -F: '{print $6}')"
+        home_dir="$(getent passwd "$username" 2>/dev/null | awk -F: '{print $6}' || true)"
         if [[ -n "$home_dir" ]]; then
             printf '%s\n' "$home_dir"
             return 0
@@ -54,7 +54,7 @@ get_home_dir() {
     # macOS
     if command -v dscl >/dev/null 2>&1; then
         local home_dir
-        home_dir="$(dscl . -read "/Users/$username" NFSHomeDirectory 2>/dev/null | awk '{print $2}')"
+        home_dir="$(dscl . -read "/Users/$username" NFSHomeDirectory 2>/dev/null | awk '{print $2}' || true)"
         if [[ -n "$home_dir" ]]; then
             printf '%s\n' "$home_dir"
             return 0
@@ -62,7 +62,15 @@ get_home_dir() {
     fi
 
     # Fallback (tilde expansion)
-    eval "printf '%s\n' ~$username"
+    local expanded_home_dir
+    expanded_home_dir="$(eval "printf '%s\n' ~$username" 2>/dev/null || true)"
+    if [[ -n "$expanded_home_dir" ]]; then
+        printf '%s\n' "$expanded_home_dir"
+        return 0
+    fi
+
+    echo "ERROR: Could not determine home directory for user '$username'" >&2
+    return 1
 }
 
 ##########################
@@ -227,7 +235,7 @@ echo "* Removing Old .vimrc and Plugins *"
 echo "***********************************"
 echo
 
-for user in "${!USERS[@]}"
+for user in "${USERS[@]}"
 do
     HOME_DIR="$(get_home_dir "$user")"
 
