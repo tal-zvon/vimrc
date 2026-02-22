@@ -28,12 +28,42 @@ fi
 #
 #   Where 'user' is the username, and 'HOME_DIR' is the home directory
 
-if [[ -n "${SUDO_USER:-}" ]]
-then
-    declare -A USERS=( [root]=$(eval echo ~root) ["$SUDO_USER"]=$(eval echo ~"$SUDO_USER") )
-else
-    declare -A USERS=( [root]=$(eval echo ~root) )
+USERS=(root)
+if [[ -n "${SUDO_USER:-}" ]]; then
+    USERS+=("$SUDO_USER")
 fi
+
+get_home_dir() {
+    local username="$1"
+
+    if [[ -z "$username" ]]; then
+        echo "ERROR: get_home_dir: empty username" >&2
+        return 1
+    fi
+
+    # Linux
+    if command -v getent >/dev/null 2>&1; then
+        local home_dir
+        home_dir="$(getent passwd "$username" | awk -F: '{print $6}')"
+        if [[ -n "$home_dir" ]]; then
+            printf '%s\n' "$home_dir"
+            return 0
+        fi
+    fi
+
+    # macOS
+    if command -v dscl >/dev/null 2>&1; then
+        local home_dir
+        home_dir="$(dscl . -read "/Users/$username" NFSHomeDirectory 2>/dev/null | awk '{print $2}')"
+        if [[ -n "$home_dir" ]]; then
+            printf '%s\n' "$home_dir"
+            return 0
+        fi
+    fi
+
+    # Fallback (tilde expansion)
+    eval "printf '%s\n' ~$username"
+}
 
 ##########################
 # Detect Package Manager #
@@ -199,7 +229,7 @@ echo
 
 for user in "${!USERS[@]}"
 do
-    HOME_DIR=${USERS[$user]}
+    HOME_DIR="$(get_home_dir "$user")"
 
     if [[ -z "$HOME_DIR" || ! -d "$HOME_DIR" ]]; then
         echo "ERROR: Invalid HOME_DIR for user '$user': '$HOME_DIR'" >&2
@@ -224,9 +254,9 @@ echo "* Installing Neovim Config *"
 echo "****************************"
 echo
 
-for user in "${!USERS[@]}"
+for user in "${USERS[@]}"
 do
-    HOME_DIR=${USERS[$user]}
+    HOME_DIR="$(get_home_dir "$user")"
     NVIM_DIR="$HOME_DIR/.config/nvim"
 
     if [[ -z "$HOME_DIR" || ! -d "$HOME_DIR" ]]; then
