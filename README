@@ -7,7 +7,18 @@ Install:
 
     sudo bash -c "$(curl -H 'Cache-Control: no-cache' -fsSL https://raw.githubusercontent.com/tal-zvon/vimrc/master/install.sh)"
     
-Optional Args:
+Updates:
 
-    Add --with-rust to install support for Rust. This may not work on older distributions, like
-    Raspbian, or CentOS because their nvim version is too old.
+    Auto updates are handled by a custom script: auto_update.lua.
+    It runs at most once per hour, on vim startup.
+    To see debug messages from it, run:
+      $ NVIM_VIMRC_AUTO_UPDATE_DEBUG=1 nvim
+
+    OR
+      :lua vim.g.vimrc_auto_update_debug = true
+      :lua require("config.auto_update").check_for_updates()
+
+    To force updates without waiting an hour, delete its state file:
+      $ rm -f ~/.local/state/nvim/vimrc_auto_update.json
+
+    Then run neovim again
