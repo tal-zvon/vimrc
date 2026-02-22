@@ -14,6 +14,28 @@ local function now_epoch()
   return os.time()
 end
 
+local function trim(text)
+  return (text:gsub("^%s+", ""):gsub("%s+$", ""))
+end
+
+local function ellipsize(text, max_len)
+  local cleaned = trim(text or "")
+  if #cleaned <= max_len then
+    return cleaned
+  end
+  return cleaned:sub(1, max_len) .. "…"
+end
+
+local function is_debug_enabled()
+  local env = os.getenv("NVIM_VIMRC_AUTO_UPDATE_DEBUG")
+  if env == "1" or env == "true" or env == "yes" then
+    return true
+  end
+
+  local g_value = vim.g.vimrc_auto_update_debug
+  return g_value == 1 or g_value == true or g_value == "1" or g_value == "true"
+end
+
 local function notify(message, level)
   -- LazyVim.notify(msg, opts) where opts.level is the level
   if _G.LazyVim and type(_G.LazyVim.notify) == "function" then
@@ -28,6 +50,13 @@ local function notify(message, level)
 
   -- Fallback: vim.notify(msg, level, opts)
   pcall(vim.notify, message, level, { title = NOTIFY_TITLE })
+end
+
+local function debug_notify(message)
+  if not is_debug_enabled() then
+    return
+  end
+  notify(message, vim.log.levels.INFO)
 end
 
 local function ensure_state_directory_exists()
@@ -76,6 +105,7 @@ local function maybe_notify_failure_throttled(state, message)
   local last_time = state.last_failure_notify_epoch or 0
 
   if (current_time - last_time) < FAILURE_NOTIFY_COOLDOWN_SECONDS then
+    debug_notify("DEBUG: Failure occurred, but notification is throttled.")
     return
   end
 
@@ -88,11 +118,14 @@ end
 local function set_next_check(state, seconds_from_now)
   state.next_check_epoch = now_epoch() + seconds_from_now
   write_state(state)
+  debug_notify(("DEBUG: next_check_epoch set to %d (in %d seconds)"):format(state.next_check_epoch, seconds_from_now))
 end
 
 local has_vim_system = type(vim.system) == "function"
 
 local function run_command(command_args, cwd, on_complete)
+  debug_notify(("DEBUG: Running command in %s: %s"):format(cwd, table.concat(command_args, " ")))
+
   if has_vim_system then
     vim.system(command_args, { cwd = cwd, text = true }, function(result)
       vim.schedule(function()
@@ -145,114 +178,159 @@ local function is_git_repo(config_directory)
   return uv.fs_stat(config_directory .. "/.git") ~= nil
 end
 
-local function trim(text)
-  return (text:gsub("^%s+", ""):gsub("%s+$", ""))
-end
-
 local M = {}
 local is_running = false
 
 function M.check_for_updates()
   if is_running then
+    debug_notify("DEBUG: Already running; skipping.")
     return
   end
   is_running = true
 
+  local function finish()
+    is_running = false
+    debug_notify("DEBUG: Finished.")
+  end
+
   local state = read_state()
   local current_time = now_epoch()
 
+  debug_notify("DEBUG: Starting auto-update check.")
+  debug_notify(("DEBUG: state_file_path=%s"):format(state_file_path))
+  debug_notify(("DEBUG: now=%d next_check_epoch=%d last_failure_notify_epoch=%d"):format(
+    current_time,
+    state.next_check_epoch or 0,
+    state.last_failure_notify_epoch or 0
+  ))
+
   if current_time < (state.next_check_epoch or 0) then
-    is_running = false
+    local seconds_left = (state.next_check_epoch or 0) - current_time
+    debug_notify(("DEBUG: Rate-limited; next check in %d seconds."):format(seconds_left))
+    finish()
     return
   end
 
-  -- Set a default hourly backoff immediately so repeated opens don't spam checks
+  -- Set hourly backoff immediately so repeated opens don't spam checks
   set_next_check(state, SUCCESS_BACKOFF_SECONDS)
 
   if vim.fn.executable("git") ~= 1 then
     maybe_notify_failure_throttled(state, "git not found on PATH; skipping auto-update.")
-    is_running = false
+    finish()
     return
   end
 
   local config_directory = vim.fn.stdpath("config")
+  debug_notify(("DEBUG: stdpath('config')=%s"):format(config_directory))
+
   if not is_git_repo(config_directory) then
     maybe_notify_failure_throttled(state, "Config directory is not a git repo; skipping auto-update.")
-    is_running = false
+    finish()
     return
   end
 
   -- If user is actively editing config, don't try to pull over it.
   run_command({ "git", "status", "--porcelain" }, config_directory, function(status_code, stdout, stderr)
+    debug_notify(("DEBUG: git status exit=%d stdout=%q stderr=%q"):format(
+      status_code,
+      ellipsize(stdout, 200),
+      ellipsize(stderr, 200)
+    ))
+
     if status_code ~= 0 then
       set_next_check(state, FAILURE_BACKOFF_SECONDS)
-      maybe_notify_failure_throttled(state, "git status failed; will retry later.\n" .. trim(stderr))
-      is_running = false
+      maybe_notify_failure_throttled(state, "git status failed; will retry later.\n" .. ellipsize(stderr, 400))
+      finish()
       return
     end
 
     if trim(stdout) ~= "" then
       maybe_notify_failure_throttled(state, "Config repo has local changes; skipping auto-update.")
-      is_running = false
+      finish()
       return
     end
 
-    -- Detached HEAD check (optional, but avoids weird states)
+    -- Detached HEAD check
     run_command({ "git", "rev-parse", "--abbrev-ref", "HEAD" }, config_directory, function(head_code, head_out, head_err)
+      debug_notify(("DEBUG: git branch exit=%d branch=%q err=%q"):format(
+        head_code,
+        trim(head_out),
+        ellipsize(head_err, 200)
+      ))
+
       if head_code ~= 0 then
         set_next_check(state, FAILURE_BACKOFF_SECONDS)
-        maybe_notify_failure_throttled(state, "Failed to read current branch; will retry later.\n" .. trim(head_err))
-        is_running = false
+        maybe_notify_failure_throttled(state, "Failed to read current branch; will retry later.\n" .. ellipsize(head_err, 400))
+        finish()
         return
       end
 
       if trim(head_out) == "HEAD" then
         maybe_notify_failure_throttled(state, "Repo is in detached HEAD; skipping auto-update.")
-        is_running = false
+        finish()
         return
       end
 
       -- Ensure upstream exists
       run_command({ "git", "rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}" }, config_directory, function(up_code, up_out, up_err)
+        debug_notify(("DEBUG: git upstream exit=%d upstream=%q err=%q"):format(
+          up_code,
+          trim(up_out),
+          ellipsize(up_err, 200)
+        ))
+
         if up_code ~= 0 then
-          maybe_notify_failure_throttled(state, "No upstream tracking branch configured; skipping auto-update.\n" .. trim(up_err))
-          is_running = false
+          maybe_notify_failure_throttled(state, "No upstream tracking branch configured; skipping auto-update.\n" .. ellipsize(up_err, 400))
+          finish()
           return
         end
 
         -- Fetch updates
         run_command({ "git", "fetch", "--quiet", "--prune" }, config_directory, function(fetch_code, _, fetch_err)
+          debug_notify(("DEBUG: git fetch exit=%d err=%q"):format(fetch_code, ellipsize(fetch_err, 200)))
+
           if fetch_code ~= 0 then
             set_next_check(state, FAILURE_BACKOFF_SECONDS)
-            maybe_notify_failure_throttled(state, "git fetch failed; will retry later.\n" .. trim(fetch_err))
-            is_running = false
+            maybe_notify_failure_throttled(state, "git fetch failed; will retry later.\n" .. ellipsize(fetch_err, 400))
+            finish()
             return
           end
 
           -- Are we behind upstream?
           run_command({ "git", "rev-list", "--count", "HEAD..@{u}" }, config_directory, function(behind_code, behind_out, behind_err)
+            debug_notify(("DEBUG: behind check exit=%d behind=%q err=%q"):format(
+              behind_code,
+              trim(behind_out),
+              ellipsize(behind_err, 200)
+            ))
+
             if behind_code ~= 0 then
               set_next_check(state, FAILURE_BACKOFF_SECONDS)
-              maybe_notify_failure_throttled(state, "Failed to compare with upstream; will retry later.\n" .. trim(behind_err))
-              is_running = false
+              maybe_notify_failure_throttled(state, "Failed to compare with upstream; will retry later.\n" .. ellipsize(behind_err, 400))
+              finish()
               return
             end
 
             local behind_count = tonumber(trim(behind_out)) or 0
             if behind_count <= 0 then
-              is_running = false
+              debug_notify("DEBUG: Repo already up-to-date; no pull needed.")
+              finish()
               return
             end
 
+            debug_notify(("DEBUG: Repo is behind by %d commit(s); pulling ff-only."):format(behind_count))
+
             -- Pull fast-forward only
             run_command({ "git", "pull", "--ff-only", "--quiet" }, config_directory, function(pull_code, _, pull_err)
+              debug_notify(("DEBUG: git pull exit=%d err=%q"):format(pull_code, ellipsize(pull_err, 200)))
+
               if pull_code ~= 0 then
                 set_next_check(state, FAILURE_BACKOFF_SECONDS)
                 maybe_notify_failure_throttled(
                   state,
-                  "git pull failed (ff-only). Manual intervention needed.\n" .. trim(pull_err)
+                  "git pull failed (ff-only). Manual intervention needed.\n" .. ellipsize(pull_err, 400)
                 )
-                is_running = false
+                finish()
                 return
               end
 
@@ -265,7 +343,7 @@ function M.check_for_updates()
                 vim.log.levels.INFO
               )
 
-              is_running = false
+              finish()
             end)
           end)
         end)
@@ -278,6 +356,7 @@ function M.setup()
   vim.api.nvim_create_autocmd("User", {
     pattern = "VeryLazy",
     callback = function()
+      -- Run after everything else is loaded, but don't block.
       vim.schedule(function()
         M.check_for_updates()
       end)
