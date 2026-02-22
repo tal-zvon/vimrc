@@ -151,7 +151,6 @@ case "$PACKAGE_MANAGER" in
             neovim git fzf lazygit
             fd ripgrep
             wget luarocks
-            pbcopy
         )
         ;;
 esac
