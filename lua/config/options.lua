@@ -27,3 +27,7 @@ o.formatoptions:remove({ "t", "c" })
 
 -- Disable auto-comment on Enter and on o/O
 o.formatoptions:remove({ "r", "o" })
+
+-- Don't keep an undo file so undo history is in RAM only
+o.undofile = false
+
