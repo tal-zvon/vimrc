@@ -28,19 +28,39 @@ end
 
 local function wrap_text(s, width)
   width = width or math.floor(vim.o.columns * 0.8)
-  local out, line = {}, ""
-  for word in s:gmatch("%S+") do
-    if #line == 0 then
-      line = word
-    elseif #line + 1 + #word <= width then
-      line = line .. " " .. word
+  local wrapped_lines = {}
+
+  -- iterate original lines to preserve intentional newlines
+  for orig_line in (s .. "\n"):gmatch("(.-)\n") do
+    local out, line = {}, ""
+    for word in orig_line:gmatch("%S+") do
+      if #line == 0 then
+        line = word
+      elseif #line + 1 + #word <= width then
+        line = line .. " " .. word
+      else
+        table.insert(out, line)
+        line = word
+      end
+    end
+    if #line > 0 then table.insert(out, line) end
+
+    -- preserve empty lines too
+    if #out == 0 then
+      table.insert(wrapped_lines, "")
     else
-      table.insert(out, line)
-      line = word
+      for _, l in ipairs(out) do
+        table.insert(wrapped_lines, l)
+      end
     end
   end
-  if #line > 0 then table.insert(out, line) end
-  return table.concat(out, "\n")
+
+  -- remove the extra line added by (s.."\n") if s ended with newline
+  if s:sub(-1) == "\n" and wrapped_lines[#wrapped_lines] == "" then
+    table.remove(wrapped_lines, #wrapped_lines)
+  end
+
+  return table.concat(wrapped_lines, "\n")
 end
 
 local function is_debug_enabled()
