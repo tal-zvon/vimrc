@@ -75,7 +75,7 @@ end
 
 local function notify(message, level, timeout_ms)
   local msg = (type(message) == "string") and message or (vim.inspect and vim.inspect(message) or tostring(message))
-  msg = wrap_text(msg) -- or wrap_text_preserve_newlines if you adopt that version
+  msg = wrap_text(msg)
 
   local opts = { title = NOTIFY_TITLE }
   if type(timeout_ms) == "number" then
