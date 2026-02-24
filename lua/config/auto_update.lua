@@ -26,6 +26,23 @@ local function ellipsize(text, max_len)
   return cleaned:sub(1, max_len) .. "…"
 end
 
+local function wrap_text(s, width)
+  width = width or math.floor(vim.o.columns * 0.8)
+  local out, line = {}, ""
+  for word in s:gmatch("%S+") do
+    if #line == 0 then
+      line = word
+    elseif #line + 1 + #word <= width then
+      line = line .. " " .. word
+    else
+      table.insert(out, line)
+      line = word
+    end
+  end
+  if #line > 0 then table.insert(out, line) end
+  return table.concat(out, "\n")
+end
+
 local function is_debug_enabled()
   local env = os.getenv("NVIM_VIMRC_AUTO_UPDATE_DEBUG")
   if env == "1" or env == "true" or env == "yes" then
@@ -36,20 +53,38 @@ local function is_debug_enabled()
   return g_value == 1 or g_value == true or g_value == "1" or g_value == "true"
 end
 
-local function notify(message, level)
+local function notify(message, level, timeout_ms)
+  -- normalize message
+  local msg
+  if type(message) == "string" then
+    msg = message
+  else
+    -- avoid errors if message is a table/number/etc.
+    msg = vim.inspect(message)
+  end
+
+  -- wrap all notifications so long text doesn't run off-screen
+  msg = wrap_text(msg)
+
+  local opts = {
+    title = NOTIFY_TITLE,
+    level = level,
+  }
+  if type(timeout_ms) == "number" then
+    opts.timeout = timeout_ms
+  end
+
   -- LazyVim.notify(msg, opts) where opts.level is the level
   if _G.LazyVim and type(_G.LazyVim.notify) == "function" then
-    local ok = pcall(_G.LazyVim.notify, message, {
-      title = NOTIFY_TITLE,
-      level = level,
-    })
+    local ok = pcall(_G.LazyVim.notify, msg, opts)
     if ok then
       return
     end
   end
 
   -- Fallback: vim.notify(msg, level, opts)
-  pcall(vim.notify, message, level, { title = NOTIFY_TITLE })
+  -- (vim.notify expects `level` separately; opts can still include title/timeout)
+  pcall(vim.notify, msg, level, { title = NOTIFY_TITLE, timeout = opts.timeout })
 end
 
 local function debug_notify(message)
@@ -340,7 +375,8 @@ function M.check_for_updates()
                   behind_count,
                   behind_count == 1 and "" or "s"
                 ),
-                vim.log.levels.INFO
+                vim.log.levels.INFO,
+                15000
               )
 
               finish()
