@@ -374,7 +374,7 @@ function M.check_for_updates()
                   behind_count == 1 and "" or "s"
                 ),
                 vim.log.levels.INFO,
-                15000
+                60000
               )
 
               finish()
