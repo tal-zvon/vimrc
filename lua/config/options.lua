@@ -35,3 +35,5 @@ g.autoformat = false
 -- Don't keep an undo file so undo history is in RAM only
 o.undofile = false
 
+-- Add border around windows like Code Diagnostic window (<leader>cd)
+o.winborder = "rounded"
