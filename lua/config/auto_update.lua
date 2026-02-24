@@ -74,37 +74,15 @@ local function is_debug_enabled()
 end
 
 local function notify(message, level, timeout_ms)
-  -- normalize message
-  local msg
-  if type(message) == "string" then
-    msg = message
-  else
-    -- avoid errors if message is a table/number/etc.
-    msg = vim.inspect(message)
-  end
+  local msg = (type(message) == "string") and message or (vim.inspect and vim.inspect(message) or tostring(message))
+  msg = wrap_text(msg) -- or wrap_text_preserve_newlines if you adopt that version
 
-  -- wrap all notifications so long text doesn't run off-screen
-  msg = wrap_text(msg)
-
-  local opts = {
-    title = NOTIFY_TITLE,
-    level = level,
-  }
+  local opts = { title = NOTIFY_TITLE }
   if type(timeout_ms) == "number" then
     opts.timeout = timeout_ms
   end
 
-  -- LazyVim.notify(msg, opts) where opts.level is the level
-  if _G.LazyVim and type(_G.LazyVim.notify) == "function" then
-    local ok = pcall(_G.LazyVim.notify, msg, opts)
-    if ok then
-      return
-    end
-  end
-
-  -- Fallback: vim.notify(msg, level, opts)
-  -- (vim.notify expects `level` separately; opts can still include title/timeout)
-  pcall(vim.notify, msg, level, { title = NOTIFY_TITLE, timeout = opts.timeout })
+  pcall(vim.notify, msg, level, opts)
 end
 
 local function debug_notify(message)
