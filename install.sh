@@ -374,11 +374,21 @@ done
 # Warn If Nvim is Missing #
 ###########################
 
-if [[ "$NVIM_INSTALLED" != true ]]
-then
-    echo
-    echo "*************************************"
-    echo "* WARNING: FAILED TO INSTALL NEOVIM *"
-    echo "*************************************"
-    echo
+if [[ "${NEOVIM_INSTALL_MODE:-auto}" == "skip" ]]; then
+    if ! command -v nvim >/dev/null 2>&1; then
+        echo
+        echo "***************************************"
+        echo "* NOTE: Neovim not found in root PATH *"
+        echo "* (you passed --skip-neovim)          *"
+        echo "***************************************"
+        echo
+    fi
+else
+    if ! command -v nvim >/dev/null 2>&1; then
+        echo
+        echo "*************************************"
+        echo "* WARNING: FAILED TO INSTALL NEOVIM *"
+        echo "*************************************"
+        echo
+    fi
 fi
