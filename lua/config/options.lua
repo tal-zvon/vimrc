@@ -40,4 +40,4 @@ o.winborder = "rounded"
 
 -- Start with internal clipboard only
 -- We will have a key binding to switch to unnamedplus
-vim.opt.clipboard = ""
+o.clipboard = ""
