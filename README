@@ -5,7 +5,15 @@ them.
 
 Install:
 
-    sudo bash -c "$(curl -H 'Cache-Control: no-cache' -fsSL https://raw.githubusercontent.com/tal-zvon/vimrc/master/install.sh)"
+    curl -H 'Cache-Control: no-cache' -fsSL https://raw.githubusercontent.com/tal-zvon/vimrc/master/install.sh | sudo bash -s --
+
+Install without Neovim:
+
+    If you've already installed neovim manually (ex from tar.gz if your
+    distro's package manager has a version that's too old), you can run this instead:
+
+
+    curl -H 'Cache-Control: no-cache' -fsSL https://raw.githubusercontent.com/tal-zvon/vimrc/master/install.sh | sudo bash -s -- --skip-neovim
     
 Updates:
 

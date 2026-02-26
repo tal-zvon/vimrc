@@ -16,6 +16,45 @@ then
     exit 1
 fi
 
+#######################
+# Parse CLI Arguments #
+#######################
+
+NEOVIM_INSTALL_MODE="auto"  # auto|skip|force
+
+print_help() {
+    cat <<'EOF'
+Usage: install.sh [--skip-neovim] [--force-neovim] [-h|--help]
+
+  --skip-neovim     Never attempt to install Neovim via the package manager.
+  --force-neovim    Always attempt to install Neovim via the package manager.
+                   (Overrides auto-detect.)
+  -h, --help        Show this help.
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --skip-neovim|--no-neovim)
+            NEOVIM_INSTALL_MODE="skip"
+            shift
+            ;;
+        --force-neovim)
+            NEOVIM_INSTALL_MODE="force"
+            shift
+            ;;
+        -h|--help)
+            print_help
+            exit 0
+            ;;
+        *)
+            echo "ERROR: Unknown argument: $1" >&2
+            echo "Run with --help for usage." >&2
+            exit 2
+            ;;
+    esac
+done
+
 #################
 # Set Some Vars #
 #################
@@ -107,6 +146,35 @@ fi
 
 echo "Using package manager: $PACKAGE_MANAGER"
 
+####################################
+# Decide Whether to Install Neovim #
+####################################
+
+if command -v nvim >/dev/null 2>&1; then
+    NVIM_ALREADY_INSTALLED=true
+else
+    NVIM_ALREADY_INSTALLED=false
+fi
+
+INSTALL_NEOVIM=false
+case "$NEOVIM_INSTALL_MODE" in
+    force)
+        INSTALL_NEOVIM=true
+        ;;
+    skip)
+        INSTALL_NEOVIM=false
+        ;;
+    auto)
+        if [[ "$NVIM_ALREADY_INSTALLED" == false ]]; then
+            INSTALL_NEOVIM=true
+        fi
+        ;;
+    *)
+        echo "ERROR: Invalid NEOVIM_INSTALL_MODE: $NEOVIM_INSTALL_MODE" >&2
+        exit 2
+        ;;
+esac
+
 ########################
 # Install Requirements #
 ########################
@@ -120,40 +188,46 @@ echo
 case "$PACKAGE_MANAGER" in
     apt)
         PACKAGES=(
-            neovim git fzf lazygit
+            git fzf lazygit
             fd-find curl ripgrep
             wget luarocks
         )
         ;;
     dnf|yum)
         PACKAGES=(
-            neovim git fzf lazygit
+            git fzf lazygit
             fd-find curl ripgrep
             wget luarocks
         )
         ;;
     pacman)
         PACKAGES=(
-            neovim git fzf lazygit
+            git fzf lazygit
             fd curl ripgrep
             wget luarocks
         )
         ;;
     apk)
         PACKAGES=(
-            neovim git fzf
+            git fzf
             fd curl ripgrep
             wget luarocks
         )
         ;;
     brew)
         PACKAGES=(
-            neovim git fzf lazygit
+            git fzf lazygit
             fd ripgrep
             wget luarocks
         )
         ;;
 esac
+
+if [[ "$INSTALL_NEOVIM" == true ]]; then
+    PACKAGES=( neovim "${PACKAGES[@]}" )
+else
+    echo "Skipping Neovim install (mode=$NEOVIM_INSTALL_MODE, nvim_present=$NVIM_ALREADY_INSTALLED)"
+fi
 
 for pkg in "${PACKAGES[@]}"
 do
