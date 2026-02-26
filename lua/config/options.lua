@@ -37,3 +37,7 @@ o.undofile = false
 
 -- Add border around windows like Code Diagnostic window (<leader>cd)
 o.winborder = "rounded"
+
+-- Start with internal clipboard only
+-- We will have a key binding to switch to unnamedplus
+vim.opt.clipboard = ""
