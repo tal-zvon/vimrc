@@ -24,7 +24,7 @@ return {
         hl.DiffChange = { bg = "#2a4556" }
 
         -- The specific "word" highlight
-        hl.DiffText = { bg = "#51576d", fg = colors.orange, bold = true }
+        hl.DiffText = { bg = "#3d59a1", fg = colors.orange, bold = true }
       end,
     },
   },
