@@ -19,21 +19,31 @@ vim.api.nvim_create_autocmd("BufEnter", {
 -- Show nicer fold text in diff mode
 _G.MyFoldText = function()
   local line_count = vim.v.foldend - vim.v.foldstart + 1
-  return "---- " .. line_count .. "  lines " .. string.rep("-", 50)
+  return "---- " .. line_count .. " lines " .. string.rep("-", 50)
 end
 
-vim.api.nvim_create_autocmd({ "DiffUpdated", "WinEnter" }, {
-  group = vim.api.nvim_create_augroup("DiffFoldText", { clear = true }),
+vim.api.nvim_create_autocmd({ "DiffUpdated", "WinEnter", "BufWinEnter" }, {
+  group = vim.api.nvim_create_augroup("DiffVisualCleanup", { clear = true }),
   callback = function()
-    -- Loop through every window in the current tab
     for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-      -- Check if that specific window is in diff mode
-      if vim.api.nvim_get_option_value("diff", { win = win }) then
+      local is_diff = vim.api.nvim_get_option_value("diff", { win = win })
+      local buf = vim.api.nvim_win_get_buf(win)
+
+      if is_diff then
         vim.api.nvim_set_option_value("foldtext", "v:lua.MyFoldText()", { win = win })
+
+        -- Disable Snacks indent guides (fixes the 'l' being eaten)
+        pcall(function()
+          require("snacks").indent.disable({ buf = buf })
+        end)
       else
+        -- Revert to LazyVim defaults
         vim.api.nvim_set_option_value("foldtext", "foldtext()", { win = win })
+        
+        pcall(function()
+          require("snacks").indent.enable({ buf = buf })
+        end)
       end
     end
   end,
 })
-
