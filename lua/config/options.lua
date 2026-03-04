@@ -41,3 +41,8 @@ o.winborder = "rounded"
 -- Start with internal clipboard only
 -- We will have a key binding to switch to unnamedplus
 o.clipboard = ""
+
+-- Neovide settings
+if vim.g.neovide then
+  vim.g.neovide_scale_factor = 2.0
+end
