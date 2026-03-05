@@ -30,7 +30,17 @@ Install local plugins:
 
     So when your lock file changes, your auto-updater doesn't freak out
     that your directory is dirty
-    
+
+Install Tree-sitter on older Linux Servers:
+
+    If Mason fails to install Tree-sitter on an older server, like Rocky Linux,
+    because your GLIBC is too old, you can install it manually:
+
+    $ cargo install tree-sitter-cli
+
+    Cargo will compile it for your system. Mason will automatically detect it,
+    and won't try to install it anymore.
+
 Updates:
 
     Auto updates are handled by a custom script: auto_update.lua.
