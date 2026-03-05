@@ -14,13 +14,32 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
-require("lazy").setup({
-  spec = {
+local spec = {
     -- add LazyVim and import its plugins
     { "LazyVim/LazyVim", import = "lazyvim.plugins" },
     -- import/override with your plugins
     { import = "plugins" },
-  },
+  }
+
+-- Check if local_plugins should be included
+local local_plugins_dir = vim.fn.stdpath("config") .. "/lua/local_plugins"
+
+local handle = vim.loop.fs_scandir(local_plugins_dir)
+if handle then
+  while true do
+    local name, type = vim.loop.fs_scandir_next(handle)
+    if not name then
+      break
+    end
+    if name:match("%.lua$") then
+      table.insert(spec, { import = "local_plugins" })
+      break
+    end
+  end
+end
+
+require("lazy").setup({
+  spec = spec,
   defaults = {
     -- By default, only LazyVim plugins will be lazy-loaded. Your custom plugins will load during startup.
     -- If you know what you're doing, you can set this to `true` to have all your custom plugins lazy-loaded by default.

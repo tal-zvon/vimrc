@@ -1,0 +1,9 @@
+Add specs here for plugins that you only want to install on the current
+system. Ex: copilot can be installed on my work machine, but doesn't need
+to be installed on other machines where I don't have a subscription
+
+Do NOT modify copilot.lua.template. Copy it.
+
+Also make sure your lock file is locally ignored with:
+
+$ git update-index --skip-worktree lazy-lock.json

@@ -1,1 +1,4 @@
 lazyvim.json
+lua/local_plugins/*
+!lua/local_plugins/README
+!lua/local_plugins/copilot.lua.template
