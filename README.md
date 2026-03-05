@@ -21,9 +21,9 @@ curl -H 'Cache-Control: no-cache' -fsSL https://raw.githubusercontent.com/tal-zv
 ## Install local plugins:
 
 If you want to install plugins locally that you don't want to commit to
-the git repo, you can add spec files to lua/local_plugins/. They look
-and work exactly the same as the specs in lua/plugins/, but are ignored
-by .gitignore. That's the only difference.
+the git repo, you can add spec files to `lua/local_plugins/`. They look
+and work exactly the same as the specs in `lua/plugins/`, but are ignored
+by `.gitignore`. That's the only difference.
 
 You'll also need to run:
 
@@ -39,7 +39,9 @@ that your directory is dirty
 If Mason fails to install Tree-sitter on an older server, like Rocky Linux,
 because your GLIBC is too old, you can install it manually:
 
-$ cargo install tree-sitter-cli
+```bash
+cargo install tree-sitter-cli
+```
 
 Cargo will compile it for your system. Mason will automatically detect it,
 and won't try to install it anymore.
@@ -49,13 +51,22 @@ and won't try to install it anymore.
 Auto updates are handled by a custom script: auto_update.lua.
 It runs at most once per hour, on vim startup.
 To see debug messages from it, run:
-  $ NVIM_VIMRC_AUTO_UPDATE_DEBUG=1 nvim
+
+```bash
+NVIM_VIMRC_AUTO_UPDATE_DEBUG=1 nvim
+```
 
 OR
-  :lua vim.g.vimrc_auto_update_debug = true
-  :lua require("config.auto_update").check_for_updates()
+
+```
+:lua vim.g.vimrc_auto_update_debug = true
+:lua require("config.auto_update").check_for_updates()
+```
 
 To force updates without waiting an hour, delete its state file:
-  $ rm -f ~/.local/state/nvim/vimrc_auto_update.json
+
+```bash
+rm -f ~/.local/state/nvim/vimrc_auto_update.json
+```
 
 Then run neovim again
