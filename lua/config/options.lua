@@ -42,6 +42,16 @@ o.winborder = "rounded"
 -- We will have a key binding to switch to unnamedplus
 o.clipboard = ""
 
+-- List characters
+-- Note: Tab filler characters are visually overlapping with snacks
+-- indentation guides, so I set them to two spaces instead of a visible
+-- character
+o.listchars = {
+  tab = "  ",
+  nbsp = "␣",
+  trail = " ",
+}
+
 -- Neovide settings
 if vim.g.neovide then
   vim.g.neovide_scale_factor = 2.0

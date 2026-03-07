@@ -10,6 +10,16 @@ return {
         hl["@module.python"] = { fg = colors.blue }
         hl["@type.python"] = { fg = colors.orange }
 
+        ----------------------------------
+        -- Highlight Bad Whitespace Red --
+        ----------------------------------
+
+        -- Show whitespace characters
+        -- This applies to anything in listchars, which includes tabs, trailing
+        -- spaces, and non-breaking spaces (invisible unicode characters that look
+        -- like a space, but are not treated as whitespace by most tools)
+        hl.Whitespace = { bg = "#ff0000", bold = true }
+
         -------------------------------------------------------
         -- Fix diff so it's not a mess of distracting colors --
         -------------------------------------------------------
