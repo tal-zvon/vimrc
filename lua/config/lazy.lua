@@ -15,11 +15,11 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 local spec = {
-    -- add LazyVim and import its plugins
-    { "LazyVim/LazyVim", import = "lazyvim.plugins" },
-    -- import/override with your plugins
-    { import = "plugins" },
-  }
+  -- add LazyVim and import its plugins
+  { "LazyVim/LazyVim", import = "lazyvim.plugins" },
+  -- import/override with your plugins
+  { import = "plugins" },
+}
 
 -- Check if local_plugins should be included
 local local_plugins_dir = vim.fn.stdpath("config") .. "/lua/local_plugins"

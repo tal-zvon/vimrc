@@ -43,7 +43,9 @@ local function wrap_text(s, width)
         line = word
       end
     end
-    if #line > 0 then table.insert(out, line) end
+    if #line > 0 then
+      table.insert(out, line)
+    end
 
     -- preserve empty lines too
     if #out == 0 then
@@ -231,11 +233,13 @@ function M.check_for_updates()
 
   debug_notify("DEBUG: Starting auto-update check.")
   debug_notify(("DEBUG: state_file_path=%s"):format(state_file_path))
-  debug_notify(("DEBUG: now=%d next_check_epoch=%d last_failure_notify_epoch=%d"):format(
-    current_time,
-    state.next_check_epoch or 0,
-    state.last_failure_notify_epoch or 0
-  ))
+  debug_notify(
+    ("DEBUG: now=%d next_check_epoch=%d last_failure_notify_epoch=%d"):format(
+      current_time,
+      state.next_check_epoch or 0,
+      state.last_failure_notify_epoch or 0
+    )
+  )
 
   if current_time < (state.next_check_epoch or 0) then
     local seconds_left = (state.next_check_epoch or 0) - current_time
@@ -264,11 +268,13 @@ function M.check_for_updates()
 
   -- If user is actively editing config, don't try to pull over it.
   run_command({ "git", "status", "--porcelain" }, config_directory, function(status_code, stdout, stderr)
-    debug_notify(("DEBUG: git status exit=%d stdout=%q stderr=%q"):format(
-      status_code,
-      ellipsize(stdout, 200),
-      ellipsize(stderr, 200)
-    ))
+    debug_notify(
+      ("DEBUG: git status exit=%d stdout=%q stderr=%q"):format(
+        status_code,
+        ellipsize(stdout, 200),
+        ellipsize(stderr, 200)
+      )
+    )
 
     if status_code ~= 0 then
       set_next_check(state, FAILURE_BACKOFF_SECONDS)
@@ -284,105 +290,131 @@ function M.check_for_updates()
     end
 
     -- Detached HEAD check
-    run_command({ "git", "rev-parse", "--abbrev-ref", "HEAD" }, config_directory, function(head_code, head_out, head_err)
-      debug_notify(("DEBUG: git branch exit=%d branch=%q err=%q"):format(
-        head_code,
-        trim(head_out),
-        ellipsize(head_err, 200)
-      ))
+    run_command(
+      { "git", "rev-parse", "--abbrev-ref", "HEAD" },
+      config_directory,
+      function(head_code, head_out, head_err)
+        debug_notify(
+          ("DEBUG: git branch exit=%d branch=%q err=%q"):format(head_code, trim(head_out), ellipsize(head_err, 200))
+        )
 
-      if head_code ~= 0 then
-        set_next_check(state, FAILURE_BACKOFF_SECONDS)
-        maybe_notify_failure_throttled(state, "Failed to read current branch; will retry later.\n" .. ellipsize(head_err, 400))
-        finish()
-        return
-      end
-
-      if trim(head_out) == "HEAD" then
-        maybe_notify_failure_throttled(state, "Repo is in detached HEAD; skipping auto-update.")
-        finish()
-        return
-      end
-
-      -- Ensure upstream exists
-      run_command({ "git", "rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}" }, config_directory, function(up_code, up_out, up_err)
-        debug_notify(("DEBUG: git upstream exit=%d upstream=%q err=%q"):format(
-          up_code,
-          trim(up_out),
-          ellipsize(up_err, 200)
-        ))
-
-        if up_code ~= 0 then
-          maybe_notify_failure_throttled(state, "No upstream tracking branch configured; skipping auto-update.\n" .. ellipsize(up_err, 400))
+        if head_code ~= 0 then
+          set_next_check(state, FAILURE_BACKOFF_SECONDS)
+          maybe_notify_failure_throttled(
+            state,
+            "Failed to read current branch; will retry later.\n" .. ellipsize(head_err, 400)
+          )
           finish()
           return
         end
 
-        -- Fetch updates
-        run_command({ "git", "fetch", "--quiet", "--prune" }, config_directory, function(fetch_code, _, fetch_err)
-          debug_notify(("DEBUG: git fetch exit=%d err=%q"):format(fetch_code, ellipsize(fetch_err, 200)))
+        if trim(head_out) == "HEAD" then
+          maybe_notify_failure_throttled(state, "Repo is in detached HEAD; skipping auto-update.")
+          finish()
+          return
+        end
 
-          if fetch_code ~= 0 then
-            set_next_check(state, FAILURE_BACKOFF_SECONDS)
-            maybe_notify_failure_throttled(state, "git fetch failed; will retry later.\n" .. ellipsize(fetch_err, 400))
-            finish()
-            return
-          end
+        -- Ensure upstream exists
+        run_command(
+          { "git", "rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}" },
+          config_directory,
+          function(up_code, up_out, up_err)
+            debug_notify(
+              ("DEBUG: git upstream exit=%d upstream=%q err=%q"):format(up_code, trim(up_out), ellipsize(up_err, 200))
+            )
 
-          -- Are we behind upstream?
-          run_command({ "git", "rev-list", "--count", "HEAD..@{u}" }, config_directory, function(behind_code, behind_out, behind_err)
-            debug_notify(("DEBUG: behind check exit=%d behind=%q err=%q"):format(
-              behind_code,
-              trim(behind_out),
-              ellipsize(behind_err, 200)
-            ))
-
-            if behind_code ~= 0 then
-              set_next_check(state, FAILURE_BACKOFF_SECONDS)
-              maybe_notify_failure_throttled(state, "Failed to compare with upstream; will retry later.\n" .. ellipsize(behind_err, 400))
+            if up_code ~= 0 then
+              maybe_notify_failure_throttled(
+                state,
+                "No upstream tracking branch configured; skipping auto-update.\n" .. ellipsize(up_err, 400)
+              )
               finish()
               return
             end
 
-            local behind_count = tonumber(trim(behind_out)) or 0
-            if behind_count <= 0 then
-              debug_notify("DEBUG: Repo already up-to-date; no pull needed.")
-              finish()
-              return
-            end
+            -- Fetch updates
+            run_command({ "git", "fetch", "--quiet", "--prune" }, config_directory, function(fetch_code, _, fetch_err)
+              debug_notify(("DEBUG: git fetch exit=%d err=%q"):format(fetch_code, ellipsize(fetch_err, 200)))
 
-            debug_notify(("DEBUG: Repo is behind by %d commit(s); pulling ff-only."):format(behind_count))
-
-            -- Pull fast-forward only
-            run_command({ "git", "pull", "--ff-only", "--quiet" }, config_directory, function(pull_code, _, pull_err)
-              debug_notify(("DEBUG: git pull exit=%d err=%q"):format(pull_code, ellipsize(pull_err, 200)))
-
-              if pull_code ~= 0 then
+              if fetch_code ~= 0 then
                 set_next_check(state, FAILURE_BACKOFF_SECONDS)
                 maybe_notify_failure_throttled(
                   state,
-                  "git pull failed (ff-only). Manual intervention needed.\n" .. ellipsize(pull_err, 400)
+                  "git fetch failed; will retry later.\n" .. ellipsize(fetch_err, 400)
                 )
                 finish()
                 return
               end
 
-              notify(
-                ("Config updated from %s (%d commit%s). Restart Neovim to apply."):format(
-                  UPDATE_REPO_URL,
-                  behind_count,
-                  behind_count == 1 and "" or "s"
-                ),
-                vim.log.levels.INFO,
-                15000
-              )
+              -- Are we behind upstream?
+              run_command(
+                { "git", "rev-list", "--count", "HEAD..@{u}" },
+                config_directory,
+                function(behind_code, behind_out, behind_err)
+                  debug_notify(
+                    ("DEBUG: behind check exit=%d behind=%q err=%q"):format(
+                      behind_code,
+                      trim(behind_out),
+                      ellipsize(behind_err, 200)
+                    )
+                  )
 
-              finish()
+                  if behind_code ~= 0 then
+                    set_next_check(state, FAILURE_BACKOFF_SECONDS)
+                    maybe_notify_failure_throttled(
+                      state,
+                      "Failed to compare with upstream; will retry later.\n" .. ellipsize(behind_err, 400)
+                    )
+                    finish()
+                    return
+                  end
+
+                  local behind_count = tonumber(trim(behind_out)) or 0
+                  if behind_count <= 0 then
+                    debug_notify("DEBUG: Repo already up-to-date; no pull needed.")
+                    finish()
+                    return
+                  end
+
+                  debug_notify(("DEBUG: Repo is behind by %d commit(s); pulling ff-only."):format(behind_count))
+
+                  -- Pull fast-forward only
+                  run_command(
+                    { "git", "pull", "--ff-only", "--quiet" },
+                    config_directory,
+                    function(pull_code, _, pull_err)
+                      debug_notify(("DEBUG: git pull exit=%d err=%q"):format(pull_code, ellipsize(pull_err, 200)))
+
+                      if pull_code ~= 0 then
+                        set_next_check(state, FAILURE_BACKOFF_SECONDS)
+                        maybe_notify_failure_throttled(
+                          state,
+                          "git pull failed (ff-only). Manual intervention needed.\n" .. ellipsize(pull_err, 400)
+                        )
+                        finish()
+                        return
+                      end
+
+                      notify(
+                        ("Config updated from %s (%d commit%s). Restart Neovim to apply."):format(
+                          UPDATE_REPO_URL,
+                          behind_count,
+                          behind_count == 1 and "" or "s"
+                        ),
+                        vim.log.levels.INFO,
+                        15000
+                      )
+
+                      finish()
+                    end
+                  )
+                end
+              )
             end)
-          end)
-        end)
-      end)
-    end)
+          end
+        )
+      end
+    )
   end)
 end
 

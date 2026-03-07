@@ -16,15 +16,14 @@ return {
       end,
     },
     picker = {
-        win = {
-            preview = {
-                wo = {
-                    wrap = true,
-                    linebreak = true, -- optional, nicer wrapping
-                },
-            },
+      win = {
+        preview = {
+          wo = {
+            wrap = true,
+            linebreak = true, -- optional, nicer wrapping
+          },
         },
+      },
     },
   },
 }
-

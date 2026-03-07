@@ -6,10 +6,10 @@ return {
     event = "VeryLazy",
     opts = {
       enable = true,
-      max_lines = 3,      -- how many context lines to show
+      max_lines = 3, -- how many context lines to show
       trim_scope = "outer",
-      mode = "cursor",    -- or "topline"
-      separator = "-",    -- set to nil if you don't want a divider
+      mode = "cursor", -- or "topline"
+      separator = "-", -- set to nil if you don't want a divider
     },
   },
 }

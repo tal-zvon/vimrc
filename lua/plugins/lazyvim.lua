@@ -31,7 +31,7 @@ _G.search_open_buffers_content = function()
       if not item._line then
         return {
           { icon_text, icon_hl },
-          { item._tail or item.text, "" }
+          { item._tail or item.text, "" },
         }
       end
 
@@ -59,7 +59,7 @@ _G.search_open_buffers_content = function()
               table.insert(results, {
                 file = name,
                 buf = buf,
-                text = vim.fn.fnamemodify(name, ":t")
+                text = vim.fn.fnamemodify(name, ":t"),
               })
             else
               local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
@@ -70,7 +70,9 @@ _G.search_open_buffers_content = function()
                 -- Finds all occurrences of the pattern within a single line
                 while true do
                   local start_pos, end_pos = lower_line:find(pattern, init, true)
-                  if not start_pos then break end
+                  if not start_pos then
+                    break
+                  end
 
                   local tail = vim.fn.fnamemodify(name, ":t")
 
@@ -82,7 +84,7 @@ _G.search_open_buffers_content = function()
                     _line = i,
                     _col = start_pos,
                     pos = { i, start_pos - 1 },
-                    end_pos = { i, end_pos }
+                    end_pos = { i, end_pos },
                   })
 
                   init = start_pos + 1

@@ -29,10 +29,7 @@ local handler = function(virtText, lnum, endLnum, width, truncate, ctx)
       chunkWidth = vim.fn.strdisplaywidth(chunkText)
 
       if curWidth + chunkWidth < targetWidth then
-        table.insert(
-          newVirtText,
-          { (" "):rep(targetWidth - curWidth - chunkWidth), "UfoFoldedEllipsis" }
-        )
+        table.insert(newVirtText, { (" "):rep(targetWidth - curWidth - chunkWidth), "UfoFoldedEllipsis" })
       end
       break
     end
