@@ -1,3 +1,13 @@
 return {
-  {"github/copilot.vim"}
+  "github/copilot.vim",
+  config = function()
+    -- Disable the default <Tab> mapping
+    vim.g.copilot_no_tab_map = true
+
+    -- Set the specific key to accept suggestions (e.g., <C-a>)
+    vim.keymap.set("i", "<C-a>", 'copilot#Accept("\\<CR>")', {
+      expr = true,
+      replace_keycodes = false,
+    })
+  end,
 }
