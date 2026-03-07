@@ -28,7 +28,7 @@ return {
         hl.Folded = { bg = "#151724", fg = colors.comment, italic = true }
 
         -- The added line
-        --hl.DiffAdd = { bg = "#ff0000" } 
+        --hl.DiffAdd = { bg = "#ff0000" }
 
         -- The modified line background
         hl.DiffChange = { bg = "#2a4556" }
