@@ -35,6 +35,25 @@ return {
 
         -- The specific "word" highlight
         hl.DiffText = { bg = "#3d59a1", fg = colors.orange, bold = true }
+
+        ---------------------------------------------------------
+        -- The "Nuclear Option" for the Completion Menu Colors --
+        ---------------------------------------------------------
+
+        -- Noevim popup menus (ec: Ctrl+xf)
+        -- bg is background color
+        -- fg is text color
+        --hl.Pmenu = { bg = "#FF0000", fg = "#0000FF" }
+
+        ---- NormalFloat is the general fallback, but Blink uses these:
+        --hl.BlinkCmpMenu = { bg = "#FF0000" }
+
+        ---- The currently selected item in the menu
+        --hl.PmenuSel = { bg = "#AA0000", fg = "#FFFFFF", bold = true }
+
+        ---- The scrollbar track and handle
+        --hl.PmenuThumb = { bg = "#FF5555" }
+
       end,
     },
   },
