@@ -17,6 +17,12 @@ return {
     },
     picker = {
       win = {
+        input = {
+          keys = {
+            -- Key to focus the preview
+            ["<c-w>"] = { "focus_preview", mode = { "i", "n" } },
+          },
+        },
         preview = {
           wo = {
             wrap = true,
