@@ -34,6 +34,13 @@ git update-index --skip-worktree lazy-lock.json
 So when your lock file changes, your auto-updater doesn't freak out
 that your directory is dirty
 
+## Code organization:
+
+- `lua/config/` contains core editor configuration modules.
+- `lua/startup_scripts/` contains startup-time scripts/services.
+- `lua/plugins/` contains plugin spec files.
+- `lua/plugins/utils/` contains larger helper functions used by plugin specs.
+
 ## Install Tree-sitter on older Linux Servers:
 
 If Mason fails to install Tree-sitter on an older server, like Rocky Linux,
@@ -48,7 +55,7 @@ and won't try to install it anymore.
 
 ## Updates:
 
-Auto updates are handled by a custom script: auto_update.lua.
+Auto updates are handled by a custom script: `update_git_repo.lua`.
 It runs at most once per hour, on vim startup.
 To see debug messages from it, run:
 
@@ -60,7 +67,7 @@ OR
 
 ```
 :lua vim.g.vimrc_auto_update_debug = true
-:lua require("config.auto_update").check_for_updates()
+:lua require("startup_scripts.update_git_repo").check_for_updates()
 ```
 
 To force updates without waiting an hour, delete its state file:

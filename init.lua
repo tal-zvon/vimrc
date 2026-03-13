@@ -1,4 +1,5 @@
 pcall(function()
-  require("config.update_git_repo").setup()
+  require("startup_scripts.update_git_repo").setup()
 end)
+require("config.neovide")
 require("config.lazy")

@@ -1,0 +1,11 @@
+This directory is for function-heavy helpers used by plugin spec files.
+
+Conventions:
+- Keep `lua/plugins/<name>.lua` declarative (spec/options/key wiring).
+- Move algorithmic or long helper logic into `lua/plugins/utils/<name>.lua`.
+- Export named functions from helper modules and require them from plugin specs.
+- Avoid plugin setup side effects in helpers unless the behavior is explicitly shared.
+
+Current helpers:
+- `folding.lua`: fold virtual text handler used by `lua/plugins/folding.lua`.
+- `lazyvim.lua`: auto-draft, clipboard toggle, and open-buffer-content picker helpers used by `lua/plugins/lazyvim.lua`.

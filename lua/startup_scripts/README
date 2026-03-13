@@ -1,0 +1,10 @@
+This directory is for startup-time scripts/services.
+
+Conventions:
+- Modules here run during startup or are invoked from startup hooks.
+- Keep a stable external API when possible (`setup()`, optional explicit actions).
+- Put startup orchestration in `init.lua`; keep script internals here.
+- Keep files focused on one startup concern (example: repo auto-update).
+
+Current module:
+- `update_git_repo.lua`: background git fetch/pull check for this config repo.
