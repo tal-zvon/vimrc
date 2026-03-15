@@ -37,7 +37,7 @@ return {
           -- I store all useful projects in a short list of folders
           recent = false,
           -- List of folders to look for projects
-          dev = { "~/Documents" },
+          dev = { "~/Documents", "~/.config/nvim" },
           -- List of files to look for when identifying a project
           --
           patterns = vim.list_extend(
