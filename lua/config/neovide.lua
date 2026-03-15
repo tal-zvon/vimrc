@@ -3,6 +3,7 @@ if not vim.g.neovide then
 end
 
 vim.g.neovide_scale_factor = 2.0
+vim.opt.swapfile = false       -- Disables .swp files used for recovery
 
 vim.keymap.set({ "n", "v", "s", "x", "o", "i", "l", "c", "t" }, "<D-v>", function()
   vim.api.nvim_paste(vim.fn.getreg("+"), true, -1)
