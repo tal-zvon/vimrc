@@ -370,6 +370,32 @@ do
     echo "Done for $HOME_DIR"
 done
 
+#############################################
+# Attempt to Install Plugins using Lockfile #
+#############################################
+
+if [[ "$NVIM_INSTALLED" == true ]]
+then
+    echo
+    echo "*********************************"
+    echo "* Installing Neovim Plugins... *"
+    echo "*********************************"
+    echo
+
+    for user in "${USERS[@]}"
+    do
+        HOME_DIR="$(get_home_dir "$user")"
+
+        if [[ -z "$HOME_DIR" || ! -d "$HOME_DIR" ]]; then
+            echo "ERROR: Invalid HOME_DIR for user '$user': '$HOME_DIR'" >&2
+            exit 1
+        fi
+
+        sudo -u "$user" nvim --headless "+Lazy! restore" +qall >/dev/null 2>&1 || true
+        echo "Done for $HOME_DIR"
+    done
+fi
+
 ###########################
 # Warn If Nvim is Missing #
 ###########################
