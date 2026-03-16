@@ -5,10 +5,14 @@ return {
     "kevinhwang91/nvim-ufo",
     dependencies = "kevinhwang91/promise-async",
     event = "BufReadPost", -- Load when you open a file
+    keys = {
+      { "zR", function() require("ufo").openAllFolds() end, desc = "Open all folds" },
+      { "zM", function() require("ufo").closeAllFolds() end, desc = "Close all folds" },
+    },
     opts = {
       provider_selector = function(bufnr, filetype, buftype)
-        -- Use LSP first, fallback to Treesitter, then Indent
-        return { "lsp", "indent" }
+        -- Use Treesitter only (removing indent fallback to prevent flickering updates)
+        return { "treesitter" }
       end,
     },
     config = function(_, opts)
