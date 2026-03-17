@@ -2,6 +2,7 @@ if not vim.g.neovide then
   return
 end
 
+vim.b.copilot_enabled = 0
 vim.g.neovide_scale_factor = 2.0
 vim.opt.swapfile = false       -- Disables .swp files used for recovery
 
