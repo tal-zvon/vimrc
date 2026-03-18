@@ -6,6 +6,9 @@ vim.b.copilot_enabled = 0
 vim.g.neovide_scale_factor = 2.0
 vim.opt.swapfile = false       -- Disables .swp files used for recovery
 
+vim.g.blink_snippets_enabled = false
+vim.g.blink_buffer_enabled = false
+
 vim.keymap.set({ "n", "v", "s", "x", "o", "i", "l", "c", "t" }, "<D-v>", function()
   vim.api.nvim_paste(vim.fn.getreg("+"), true, -1)
 end, { noremap = true, silent = true })
