@@ -4,11 +4,13 @@ return {
     opts = {
       servers = {
         basedpyright = {
+          handlers = {
+            ["textDocument/publishDiagnostics"] = function() end,
+          },
           settings = {
             basedpyright = {
               analysis = {
-                --diagnosticMode = "workspace",
-                --useLibraryCodeForTypes = false,
+                typeCheckingMode = "off",
               },
             },
           },
