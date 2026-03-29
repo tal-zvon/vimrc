@@ -3,6 +3,16 @@ return {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
+        basedpyright = {
+          settings = {
+            basedpyright = {
+              analysis = {
+                --diagnosticMode = "workspace",
+                --useLibraryCodeForTypes = false,
+              },
+            },
+          },
+        },
         lua_ls = {
           settings = {
             Lua = {
