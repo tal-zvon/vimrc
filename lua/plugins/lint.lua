@@ -50,54 +50,40 @@ end
 local function mypy_linter()
   local bufnr = vim.api.nvim_get_current_buf()
   local root = project_root(bufnr)
-
   local python = python_from_venv(root)
+
+  -- 1. Define the base command and arguments once
+  local cmd = "mypy"
+  local args = {
+    "--show-column-numbers",
+    "--show-error-end",
+    "--hide-error-context",
+    "--no-color-output",
+    "--no-error-summary",
+    "--no-pretty",
+    "--show-error-codes", -- CRITICAL FIX: Forces error codes so the regex parser never fails
+  }
+
+  -- 2. Modify the command and args dynamically based on environment
   if python ~= "" then
-    return {
-      cmd = python,
-      stdin = false,
-      stream = "both",
-      ignore_exitcode = true,
-      cwd = root,
-      args = {
-        "-m",
-        "mypy",
-        "--show-column-numbers",
-        "--show-error-end",
-        "--hide-error-context",
-        "--no-color-output",
-        "--no-error-summary",
-        "--no-pretty",
-      },
-      parser = require("lint.parser").from_pattern(
-        "([^:]+):(%d+):(%d+):(%d+):(%d+): (%a+): (.*) %[(%a[%a-]+)%]",
-        { "file", "lnum", "col", "end_lnum", "end_col", "severity", "message", "code" },
-        {
-          error = vim.diagnostic.severity.ERROR,
-          warning = vim.diagnostic.severity.WARN,
-          note = vim.diagnostic.severity.HINT,
-        },
-        { source = "mypy" },
-        { end_col_offset = 0 }
-      ),
-    }
+    cmd = python
+    table.insert(args, 1, "mypy")
+    table.insert(args, 1, "-m")
+  else
+    local mason_bin = mason_mypy()
+    if mason_bin ~= "" then
+      cmd = mason_bin
+    end
   end
 
-  local mypy = mason_mypy()
+  -- 3. Return the single, consolidated linter definition
   return {
-    cmd = mypy ~= "" and mypy or "mypy",
+    cmd = cmd,
     stdin = false,
     stream = "both",
     ignore_exitcode = true,
     cwd = root,
-    args = {
-      "--show-column-numbers",
-      "--show-error-end",
-      "--hide-error-context",
-      "--no-color-output",
-      "--no-error-summary",
-      "--no-pretty",
-    },
+    args = args,
     parser = require("lint.parser").from_pattern(
       "([^:]+):(%d+):(%d+):(%d+):(%d+): (%a+): (.*) %[(%a[%a-]+)%]",
       { "file", "lnum", "col", "end_lnum", "end_col", "severity", "message", "code" },
