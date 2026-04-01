@@ -12,6 +12,15 @@ local g = vim.g
 -- show existing tab with 4 spaces width
 o.tabstop = 4
 
+-- When you hit tab to add 4 spaces, with this, backspace will delete 4 spaces
+o.softtabstop=4
+
+-- when indenting with '>', use 4 spaces width
+o.shiftwidth=4
+
+-- On pressing tab, insert 4 spaces
+o.expandtab = true
+
 -- Length of idle time before vim writes to the swapfile
 -- Also controls how often vim updates git tags in gitgutter bar
 -- o.updatetime = 100
