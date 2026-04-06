@@ -13,10 +13,10 @@ local g = vim.g
 o.tabstop = 4
 
 -- When you hit tab to add 4 spaces, with this, backspace will delete 4 spaces
-o.softtabstop=4
+o.softtabstop = 4
 
 -- when indenting with '>', use 4 spaces width
-o.shiftwidth=4
+o.shiftwidth = 4
 
 -- On pressing tab, insert 4 spaces
 o.expandtab = true

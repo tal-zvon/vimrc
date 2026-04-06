@@ -74,15 +74,21 @@ vim.api.nvim_create_autocmd("BufEnter", {
 -- Auto-save when leaving insert mode or making normal mode changes
 vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged" }, {
   callback = function(args)
-    if not auto_draft_enabled then return end
+    if not auto_draft_enabled then
+      return
+    end
 
     -- Check if Neovim registers unsaved changes. If not, do nothing.
-    if not vim.bo[args.buf].modified then return end
+    if not vim.bo[args.buf].modified then
+      return
+    end
 
     local buf_name = vim.api.nvim_buf_get_name(args.buf)
 
     -- Ignore completely empty/unnamed buffers
-    if buf_name == "" then return end
+    if buf_name == "" then
+      return
+    end
 
     -- Get the canonical path of the current buffer to bypass symlinks
     local resolved_buf_name = vim.fn.resolve(buf_name)

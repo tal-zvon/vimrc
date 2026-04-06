@@ -48,7 +48,7 @@ return {
 
             -- My custom addition: I like to use .project files to mark
             -- project roots for projects that aren't git repos
-            {".project"}
+            { ".project" }
           ),
           -- How many levels of subfolders to look into when searching for
           -- projects. Default is 2
