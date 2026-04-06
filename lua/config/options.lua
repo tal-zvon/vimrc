@@ -51,6 +51,21 @@ o.winborder = "rounded"
 -- We will have a key binding to switch to unnamedplus
 o.clipboard = ""
 
+-- Enable OSC 52 clipboard integration if we are over SSH
+if vim.env.SSH_TTY or vim.env.SSH_CLIENT then
+  g.clipboard = {
+    name = "OSC 52",
+    copy = {
+      ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
+      ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
+    },
+    paste = {
+      ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
+      ["*"] = require("vim.ui.clipboard.osc52").paste("*"),
+    },
+  }
+end
+
 -- List characters
 -- Note: Tab filler characters are visually overlapping with snacks
 -- indentation guides, so I set them to two spaces instead of a visible
