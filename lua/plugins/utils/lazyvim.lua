@@ -1,6 +1,7 @@
 local M = {}
 
 local auto_draft_enabled = false
+local clipboard_autodisable_group = vim.api.nvim_create_augroup("lazyvim_toggle_clipboard", { clear = true })
 
 -- Expand the ~ to a full path, then resolve any symlinks
 local raw_folder = vim.fn.expand("~/Documents/Old Sublime Tabs/old_neovide_tabs/")
@@ -46,6 +47,33 @@ function M.toggle_auto_draft()
   auto_draft_enabled = not auto_draft_enabled
   local state = auto_draft_enabled and "Enabled" or "Disabled"
   vim.notify("Auto-Draft Mode: " .. state, vim.log.levels.INFO)
+end
+
+local function clear_clipboard_autodisable()
+  vim.api.nvim_clear_autocmds({ group = clipboard_autodisable_group })
+end
+
+local function disable_clipboard()
+  clear_clipboard_autodisable()
+  vim.opt.clipboard = ""
+  vim.notify("󰅌 OS Clipboard Disabled", vim.log.levels.INFO)
+end
+
+local function arm_clipboard_autodisable()
+  clear_clipboard_autodisable()
+
+  vim.api.nvim_create_autocmd("TextYankPost", {
+    group = clipboard_autodisable_group,
+    callback = function()
+      local event = vim.v.event or {}
+
+      if event.operator ~= "y" then
+        return
+      end
+
+      disable_clipboard()
+    end,
+  })
 end
 
 -- Catch when you enter an unnamed, empty buffer
@@ -108,11 +136,11 @@ function M.toggle_clipboard()
   local has_unnamedplus = vim.tbl_contains(clipboard, "unnamedplus")
 
   if has_unnamedplus then
-    vim.opt.clipboard = ""
-    vim.notify("󰅌 OS Clipboard Disabled", vim.log.levels.INFO)
+    disable_clipboard()
   else
     vim.opt.clipboard = "unnamedplus"
     vim.notify("󰅍 OS Clipboard Enabled", vim.log.levels.INFO)
+    arm_clipboard_autodisable()
   end
 end
 
