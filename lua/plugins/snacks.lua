@@ -1,3 +1,5 @@
+local snacks_utils = require("plugins.utils.snacks")
+
 return {
   "folke/snacks.nvim",
   opts = {
@@ -53,6 +55,27 @@ return {
           -- How many levels of subfolders to look into when searching for
           -- projects. Default is 2
           max_depth = 2,
+        },
+        lsp_workspace_symbols = {
+          matcher = {
+            sort_empty = true,
+          },
+          sort = {
+            fields = {
+              "workspace_has_query",
+              "workspace_match_kind",
+              "workspace_case_mismatches",
+              "workspace_boundary_rank",
+              "workspace_gaps",
+              "workspace_start",
+              "workspace_span",
+              "score:desc",
+              "#workspace_sort_text",
+              "workspace_sort_name",
+              "idx",
+            },
+          },
+          transform = snacks_utils.rank_workspace_symbol,
         },
       },
       win = {
