@@ -112,7 +112,7 @@ return {
 
       lint.linters.mypy = mypy_linter
 
-      lint.linters_by_ft = lint.linters_by_ft or {}
+      lint.linters_by_ft = {}
       for filetype, linters in pairs(opts.linters_by_ft or {}) do
         lint.linters_by_ft[filetype] = vim.list_extend(lint.linters_by_ft[filetype] or {}, linters)
       end
