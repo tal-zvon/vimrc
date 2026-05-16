@@ -47,6 +47,14 @@ local function mason_mypy()
   return vim.fn.exepath("mypy")
 end
 
+local function notify_mypy_missing()
+  local message = "mypy was not found. Mason is configured to install it, but no Mason binary is available. "
+    .. "Run :MasonLog or :MasonInstall mypy to see the install failure."
+  local notify = vim.notify_once or vim.notify
+
+  notify(message, vim.log.levels.ERROR)
+end
+
 local function mypy_linter()
   local bufnr = vim.api.nvim_get_current_buf()
   local root = project_root(bufnr)
@@ -54,6 +62,7 @@ local function mypy_linter()
 
   -- 1. Define the base command and arguments once
   local cmd = "mypy"
+  local missing_executable = false
   local args = {
     "--show-column-numbers",
     "--show-error-end",
@@ -73,6 +82,8 @@ local function mypy_linter()
     local mason_bin = mason_mypy()
     if mason_bin ~= "" then
       cmd = mason_bin
+    else
+      missing_executable = true
     end
   end
 
@@ -83,6 +94,7 @@ local function mypy_linter()
     stream = "both",
     ignore_exitcode = true,
     cwd = root,
+    missing_executable = missing_executable,
     args = args,
     parser = require("lint.parser").from_pattern(
       "([^:]+):(%d+):(%d+):(%d+):(%d+): (%a+): (.*) %[(%a[%a-]+)%]",
@@ -117,14 +129,27 @@ return {
         lint.linters_by_ft[filetype] = vim.list_extend(lint.linters_by_ft[filetype] or {}, linters)
       end
 
+      local function try_lint()
+        lint.try_lint(nil, {
+          filter = function(linter)
+            if linter.name == "mypy" and linter.missing_executable then
+              notify_mypy_missing()
+              return false
+            end
+
+            return true
+          end,
+        })
+      end
+
       vim.api.nvim_create_autocmd(opts.events or { "BufEnter", "BufWritePost", "InsertLeave" }, {
         callback = function()
-          lint.try_lint()
+          try_lint()
         end,
       })
 
       vim.schedule(function()
-        lint.try_lint()
+        try_lint()
       end)
     end,
   },
