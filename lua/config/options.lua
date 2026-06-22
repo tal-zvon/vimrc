@@ -47,6 +47,15 @@ o.undofile = false
 -- Add border around windows like Code Diagnostic window (<leader>cd)
 o.winborder = "rounded"
 
+-- Folding (native Neovim treesitter folds; nvim-ufo is disabled).
+-- LazyVim sets foldlevel=99 and wires foldmethod=expr + treesitter foldexpr;
+-- we just keep folds open by default, show the fold column, and use a custom
+-- foldtext that preserves syntax highlighting (see plugins/utils/folding.lua).
+o.foldcolumn = "1"
+o.foldlevelstart = 99
+o.foldenable = true
+o.foldtext = "v:lua.require'plugins.utils.folding'.foldtext()"
+
 -- Start with internal clipboard only
 -- We will have a key binding to switch to unnamedplus
 o.clipboard = ""
