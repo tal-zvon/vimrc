@@ -123,45 +123,102 @@ function M.foldtext()
   return chunks
 end
 
--- Recursively open or close the whole fold under the cursor (including nested
--- folds), even when the cursor is on the fold's first/header line.
+-- Two-tier "outer layer" folding for zO/zC.
 --
--- Native zO/zC only act on folds that *contain* the cursor line, so on a class
--- header line they leave the method folds (which start on the next line)
--- untouched. We instead operate on the fold's entire line range:
---   * zO on a class header opens the class and all its methods
---   * zC on a class header closes the class and all its methods, so reopening
---     the class with zo still shows the methods folded
----@param open boolean true => open recursively (zO), false => close (zC)
-local function fold_recursive(open)
+-- We treat folds as two tiers by nesting depth:
+--   * "class"  = the outermost fold containing the cursor (fold level 1)
+--   * "method" = the fold nested one level directly inside it (fold level 2)
+-- zO/zC always act on the *whole* enclosing method when the cursor is anywhere
+-- inside one (its body, a deeply nested block, or its multi-line signature), and
+-- on the whole class only when the cursor is at class-body/header level (not
+-- inside any method). Sibling and ancestor folds are always left untouched.
+--
+-- Why this can't use native zc/zC/zO or a plain foldclose!/foldopen!:
+-- a multi-line signature creates a nested parameter-list fold, so a method's
+-- `def` line can sit at fold level 3 (inside that param-list fold) even though
+-- the method fold is level 2. That makes native `zc` close only the param list,
+-- and native `zC` / `:foldclose!` climb outward and collapse the whole class.
+-- We instead compute the target tier's line range directly from fold levels.
+
+-- Line range [s, e] of the fold to operate on, plus its tier level L.
+-- L = 2 (method) when the cursor is inside a method (fold level >= 2), else
+-- L = 1 (class). The range is grown outward while the fold level stays >= L, so
+-- a multi-line signature (whose def line is at a deeper level) is still fully
+-- covered. Returns nil when the cursor is not inside any fold.
+---@return integer? start, integer? end_, integer? level
+local function target_range()
   local line = vim.fn.line(".")
-  if vim.fn.foldlevel(line) == 0 then
-    return
+  local level = vim.fn.foldlevel(line)
+  if level == 0 then
+    return nil
   end
 
-  -- foldclosed/foldclosedend only report a range when the fold is closed, so
-  -- briefly close an open fold to read its extent (no redraw happens in between
-  -- so this is invisible to the user).
-  if vim.fn.foldclosed(line) == -1 then
+  local L = level >= 2 and 2 or 1
+  local last = vim.fn.line("$")
+  local s, e = line, line
+  while s > 1 and vim.fn.foldlevel(s - 1) >= L do
+    s = s - 1
+  end
+  while e < last and vim.fn.foldlevel(e + 1) >= L do
+    e = e + 1
+  end
+  return s, e, L
+end
+
+-- Close the target fold [s, e] and all of its descendants, deepest-first, using
+-- `zc`. `zc` only ever closes the innermost OPEN fold at the cursor and never an
+-- ancestor, and every line in [s, e] has fold level >= L, so this can never
+-- climb out to the enclosing class or touch siblings. Deepest-first ordering
+-- means nested folds are closed before the target, so a later `zo` of the target
+-- reveals its internals still folded.
+---@param s integer fold start line
+---@param e integer fold end line
+---@param L integer target tier fold level
+local function close_within(s, e, L)
+  local max_level = 0
+  for l = s, e do
+    max_level = math.max(max_level, vim.fn.foldlevel(l))
+  end
+
+  for level = max_level, L, -1 do
+    for l = s, e do
+      if vim.fn.foldclosed(l) == -1 and vim.fn.foldlevel(l) == level then
+        vim.fn.cursor(l, 1)
+        vim.cmd("normal! zc")
+      end
+    end
+  end
+
+  -- Fallback: close the target fold itself when no line has a structural level
+  -- equal to L (e.g. a method whose entire body lives inside deeper folds).
+  vim.fn.cursor(s, 1)
+  while not (vim.fn.foldclosed(s) == s and vim.fn.foldclosedend(s) == e) do
+    local before = vim.fn.foldclosedend(s)
     vim.cmd("normal! zc")
+    local closed = vim.fn.foldclosed(s)
+    if vim.fn.foldclosedend(s) == before or vim.fn.foldclosedend(s) > e or (closed ~= -1 and closed < s) then
+      break
+    end
   end
-
-  local start_line = vim.fn.foldclosed(line)
-  local end_line = vim.fn.foldclosedend(line)
-  if start_line == -1 then
-    return
-  end
-
-  local action = open and "foldopen" or "foldclose"
-  vim.cmd(("%d,%d%s!"):format(start_line, end_line, action))
 end
 
 function M.fold_open_recursive()
-  fold_recursive(true)
+  local view = vim.fn.winsaveview()
+  local s, e = target_range()
+  if s then
+    -- Bang opens all descendant folds within the range.
+    vim.cmd(("%d,%dfoldopen!"):format(s, e))
+  end
+  vim.fn.winrestview(view)
 end
 
 function M.fold_close_recursive()
-  fold_recursive(false)
+  local view = vim.fn.winsaveview()
+  local s, e, L = target_range()
+  if s then
+    close_within(s, e, L)
+  end
+  vim.fn.winrestview(view)
 end
 
 -- Open/close all folds. In a diff window this acts on every diff window in the

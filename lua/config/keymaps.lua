@@ -16,12 +16,14 @@ map("n", "zM", function()
   require("plugins.utils.folding").fold_all(false)
 end, { desc = "Close all folds (all diff windows)" })
 
--- zO/zC on a fold's header line should open/close the whole fold tree
--- (including nested folds). Native zO/zC ignore folds that don't contain the
--- cursor line, so on a class header they leave the methods untouched.
+-- zO/zC operate on the "outer layer" fold under the cursor, in two tiers by
+-- nesting: the "class" (outermost containing fold) and the "method" (the fold
+-- one level inside it). When the cursor is anywhere inside a method (body, a
+-- nested block, or its multi-line signature) they act on the whole method;
+-- otherwise they act on the whole class. See plugins/utils/folding.lua.
 map("n", "zO", function()
   require("plugins.utils.folding").fold_open_recursive()
-end, { desc = "Open fold under cursor recursively" })
+end, { desc = "Open enclosing method/class fold recursively" })
 map("n", "zC", function()
   require("plugins.utils.folding").fold_close_recursive()
-end, { desc = "Close fold under cursor recursively" })
+end, { desc = "Close enclosing method/class fold recursively" })
