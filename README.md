@@ -118,7 +118,10 @@ Mason automatically installs Pyrefly for Python completion, navigation, and type
 diagnostics. Pyrefly does not need to be preinstalled. Mason installs it from
 PyPI, so new systems need a compatible Python 3 installation with working `venv`
 and pip support, plus network access. Some distributions require separate Python
-venv/pip packages; `install.sh` does not install these prerequisites.
+venv/pip packages. Before making installation changes, `install.sh` checks that
+Python 3 can create a virtual environment with working pip, running the check as
+the invoking user when using `sudo`. It reports an error if these prerequisites
+are missing, but does not install them.
 
 Pyrefly uses its default `auto` checking mode: it translates supported settings
 from existing Mypy configurations in memory without changing them or requiring a

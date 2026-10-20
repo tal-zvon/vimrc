@@ -55,6 +55,44 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+##############################
+# Check Python Prerequisites #
+##############################
+
+PYTHON_CHECK_USER="${SUDO_USER:-root}"
+PYTHON_CHECK_COMMAND=( python3 )
+if [[ -n "${SUDO_USER:-}" ]]; then
+    PYTHON_CHECK_COMMAND=( sudo -H -u "$SUDO_USER" -- python3 )
+fi
+
+echo "Checking Python 3, venv, and pip for $PYTHON_CHECK_USER..."
+
+if ! "${PYTHON_CHECK_COMMAND[@]}" - <<'PYTHON'
+import pathlib
+import subprocess
+import sys
+import tempfile
+
+if sys.version_info.major != 3:
+    sys.exit("ERROR: Python 3 is required.")
+
+with tempfile.TemporaryDirectory(prefix="nvim-python-check-") as directory:
+    subprocess.run(
+        [sys.executable, "-m", "venv", "--system-site-packages", directory],
+        check=True,
+    )
+    subprocess.run(
+        [str(pathlib.Path(directory) / "bin" / "python"), "-m", "pip", "--version"],
+        check=True,
+        stdout=subprocess.DEVNULL,
+    )
+PYTHON
+then
+    echo "ERROR: Python 3 with working venv and pip support is required for user '$PYTHON_CHECK_USER' so Mason can install Pyrefly." >&2
+    echo "Install Python 3 and your system's Python venv/pip packages, then rerun this installer." >&2
+    exit 1
+fi
+
 #################
 # Set Some Vars #
 #################
