@@ -4,17 +4,9 @@ return {
     opts = {
       servers = {
         basedpyright = {
-          handlers = {
-            ["textDocument/publishDiagnostics"] = function() end,
-          },
-          settings = {
-            basedpyright = {
-              analysis = {
-                typeCheckingMode = "off",
-              },
-            },
-          },
+          enabled = false,
         },
+        pyrefly = {},
         lua_ls = {
           settings = {
             Lua = {

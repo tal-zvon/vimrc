@@ -112,6 +112,27 @@ rm -f ~/.local/state/nvim/vimrc_auto_update.json
 
 Then run neovim again
 
+## Python tooling
+
+Mason automatically installs Pyrefly for Python completion, navigation, and type
+diagnostics. Pyrefly does not need to be preinstalled. Mason installs it from
+PyPI, so new systems need a compatible Python 3 installation with working `venv`
+and pip support, plus network access. Some distributions require separate Python
+venv/pip packages; `install.sh` does not install these prerequisites.
+
+Pyrefly uses its default `auto` checking mode: it translates supported settings
+from existing Mypy configurations in memory without changing them or requiring a
+Pyrefly configuration file. Without a usable configuration, it falls back to basic,
+high-confidence checks. Its diagnostics may differ from Mypy's.
+
+Use `:Mason` to inspect installation status and `:MasonLog` to investigate failures.
+To retry installation manually, run `:MasonInstall pyrefly`.
+
+Basedpyright is disabled, and Mypy is no longer installed or run by this config.
+Previously installed Mason packages may remain; optionally remove them with
+`:MasonUninstall basedpyright mypy`. Ruff remains the Python formatter, and
+formatting-on-save remains disabled.
+
 ## Formatting
 
 Run:
