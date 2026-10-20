@@ -55,8 +55,42 @@ and won't try to install it anymore.
 
 ## Updates
 
-Auto updates are handled by a custom script: `update_git_repo.lua`.
-It runs at most once per hour, on vim startup.
+### Plugins
+
+Managed plugins prefer their latest stable SemVer release. Plugins without
+stable tags follow their upstream branch. Explicit LazyVim compatibility
+branches and pins take precedence, notably for Tree-sitter.
+
+Before updating, save a copy of `lazy-lock.json` outside this repository.
+Run `:Lazy update`, then restart Neovim. To reproduce the versions in an
+existing lockfile, run `:Lazy restore` instead. For rollback, put the saved
+lockfile back, run `:Lazy restore`, restart Neovim, and run `:TSUpdate` so
+parsers match the restored Tree-sitter version.
+
+Mason's plugins are included in plugin updates, but its installed language
+servers, formatters, and linters are managed separately.
+
+If `lazy-lock.json` is marked `skip-worktree`, Git hides its local changes.
+To publish a shared lockfile update, temporarily clear that flag:
+
+```bash
+git update-index --no-skip-worktree lazy-lock.json
+git diff -- lazy-lock.json
+```
+
+After reviewing and committing the intended lockfile changes, restore the flag
+if needed for local plugins:
+
+```bash
+git update-index --skip-worktree lazy-lock.json
+```
+
+### Configuration repository
+
+Config repository auto updates are handled by `update_git_repo.lua`.
+These are separate from plugin updates; Lazy's checker only checks for newer
+plugins and does not install them automatically.
+The repository check runs at most once per hour, on vim startup.
 To see debug messages from it, run:
 
 ```bash
